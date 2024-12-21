@@ -5,9 +5,11 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Eye, EyeOff } from "lucide-react";
 import { db } from "@/db/mockDb";
+import { useNavigate } from "react-router-dom";
 
 export const LoginForm = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
@@ -26,6 +28,19 @@ export const LoginForm = () => {
         title: "Login realizado com sucesso!",
         description: `Bem-vindo(a) ${user.name}!`,
       });
+
+      // Redireciona para o painel apropriado
+      switch (user.role) {
+        case "customer":
+          navigate("/customer");
+          break;
+        case "merchant":
+          navigate("/merchant");
+          break;
+        case "admin":
+          navigate("/admin");
+          break;
+      }
     } else {
       toast({
         title: "Erro no login",
