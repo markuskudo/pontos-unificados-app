@@ -15,10 +15,22 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/components/ui/use-toast";
 
 const MerchantDashboard = () => {
   const [merchant, setMerchant] = useState<Merchant | null>(null);
   const [offers, setOffers] = useState<Offer[]>([]);
+  const { toast } = useToast();
 
   useEffect(() => {
     // Simulando busca do lojista logado
@@ -30,6 +42,27 @@ const MerchantDashboard = () => {
       setOffers(merchantOffers);
     }
   }, []);
+
+  const handleCreateOffer = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    
+    const newOffer: Offer = {
+      id: `offer-${offers.length + 1}`,
+      merchantId: merchant?.id || "",
+      title: formData.get("title") as string,
+      description: formData.get("description") as string,
+      pointsRequired: Number(formData.get("points")),
+      validUntil: new Date(formData.get("validUntil") as string),
+      active: true,
+    };
+
+    setOffers([...offers, newOffer]);
+    toast({
+      title: "Oferta criada com sucesso!",
+      description: "A nova oferta foi adicionada à sua lista.",
+    });
+  };
 
   if (!merchant) return null;
 
@@ -71,7 +104,59 @@ const MerchantDashboard = () => {
             <div className="p-6 border rounded-lg h-full">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-xl font-semibold">Minhas Ofertas</h2>
-                <Button>Nova Oferta</Button>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button>Nova Oferta</Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Criar Nova Oferta</DialogTitle>
+                    </DialogHeader>
+                    <form onSubmit={handleCreateOffer} className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="title">Título da Oferta</Label>
+                        <Input
+                          id="title"
+                          name="title"
+                          placeholder="Ex: Desconto em Compras"
+                          required
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="description">Descrição</Label>
+                        <Textarea
+                          id="description"
+                          name="description"
+                          placeholder="Descreva os detalhes da oferta"
+                          required
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="points">Pontos Necessários</Label>
+                        <Input
+                          id="points"
+                          name="points"
+                          type="number"
+                          min="0"
+                          placeholder="Ex: 5000"
+                          required
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="validUntil">Válido até</Label>
+                        <Input
+                          id="validUntil"
+                          name="validUntil"
+                          type="date"
+                          required
+                        />
+                      </div>
+                      <Button type="submit" className="w-full">
+                        Criar Oferta
+                      </Button>
+                    </form>
+                  </DialogContent>
+                </Dialog>
               </div>
 
               <Table>
