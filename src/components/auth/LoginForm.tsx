@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Eye, EyeOff } from "lucide-react";
+import { db } from "@/db/mockDb";
 
 export const LoginForm = () => {
   const { toast } = useToast();
@@ -15,11 +16,23 @@ export const LoginForm = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Simulando login
-    toast({
-      title: "Login realizado com sucesso!",
-      description: "Bem-vindo(a) de volta!",
-    });
+    
+    const user = db.findUserByEmail(formData.email);
+    
+    if (user) {
+      // Em um ambiente real, verificaríamos a senha com hash
+      // Por enquanto, apenas simulamos o login bem-sucedido
+      toast({
+        title: "Login realizado com sucesso!",
+        description: `Bem-vindo(a) ${user.name}!`,
+      });
+    } else {
+      toast({
+        title: "Erro no login",
+        description: "E-mail ou senha incorretos",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
