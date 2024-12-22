@@ -8,14 +8,6 @@ import {
 } from "@/components/ui/resizable";
 import { Button } from "@/components/ui/button";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
   Dialog,
   DialogContent,
   DialogHeader,
@@ -26,7 +18,8 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
-import { Edit, XOctagon } from "lucide-react";
+import { StoreInfo } from "@/components/merchant/StoreInfo";
+import { OfferCard } from "@/components/merchant/OfferCard";
 
 const MerchantDashboard = () => {
   const [merchant, setMerchant] = useState<Merchant | null>(null);
@@ -35,7 +28,6 @@ const MerchantDashboard = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Simulando busca do lojista logado
     const mockMerchant = db.findUserByEmail("joao@supermercado.com") as Merchant;
     setMerchant(mockMerchant);
 
@@ -56,6 +48,7 @@ const MerchantDashboard = () => {
       description: formData.get("description") as string,
       pointsRequired: Number(formData.get("points")),
       validUntil: new Date(formData.get("validUntil") as string),
+      image: formData.get("image") as string,
       active: true,
     };
 
@@ -78,6 +71,7 @@ const MerchantDashboard = () => {
       description: formData.get("description") as string,
       pointsRequired: Number(formData.get("points")),
       validUntil: new Date(formData.get("validUntil") as string),
+      image: formData.get("image") as string,
     };
 
     setOffers(offers.map(offer => 
@@ -109,29 +103,7 @@ const MerchantDashboard = () => {
 
         <ResizablePanelGroup direction="horizontal" className="min-h-[500px] rounded-lg border">
           <ResizablePanel defaultSize={30} minSize={25} maxSize={40}>
-            <div className="p-4 lg:p-6 h-full">
-              <h2 className="text-lg lg:text-xl font-semibold mb-4">Informações da Loja</h2>
-              <div className="space-y-4">
-                <div>
-                  <p className="text-sm text-muted-foreground">Nome da Loja</p>
-                  <p className="font-medium">{merchant.storeName}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Cidade</p>
-                  <p className="font-medium">{merchant.city}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Status</p>
-                  <p className="font-medium">
-                    {merchant.active ? (
-                      <span className="text-green-600">Ativo</span>
-                    ) : (
-                      <span className="text-red-600">Inativo</span>
-                    )}
-                  </p>
-                </div>
-              </div>
-            </div>
+            <StoreInfo merchant={merchant} />
           </ResizablePanel>
 
           <ResizableHandle />
@@ -187,6 +159,15 @@ const MerchantDashboard = () => {
                           required
                         />
                       </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="image">URL da Imagem</Label>
+                        <Input
+                          id="image"
+                          name="image"
+                          type="url"
+                          placeholder="https://exemplo.com/imagem.jpg"
+                        />
+                      </div>
                       <Button type="submit" className="w-full">
                         Criar Oferta
                       </Button>
@@ -195,110 +176,78 @@ const MerchantDashboard = () => {
                 </Dialog>
               </div>
 
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Título</TableHead>
-                      <TableHead className="hidden md:table-cell">Descrição</TableHead>
-                      <TableHead>Pontos</TableHead>
-                      <TableHead className="hidden md:table-cell">Validade</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Ações</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {offers.map((offer) => (
-                      <TableRow key={offer.id}>
-                        <TableCell>{offer.title}</TableCell>
-                        <TableCell className="hidden md:table-cell">{offer.description}</TableCell>
-                        <TableCell>{offer.pointsRequired} pts</TableCell>
-                        <TableCell className="hidden md:table-cell">
-                          {offer.validUntil.toLocaleDateString("pt-BR")}
-                        </TableCell>
-                        <TableCell>
-                          {offer.active ? (
-                            <span className="text-green-600">Ativa</span>
-                          ) : (
-                            <span className="text-red-600">Inativa</span>
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex gap-2">
-                            <Dialog>
-                              <DialogTrigger asChild>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={() => setEditingOffer(offer)}
-                                >
-                                  <Edit className="h-4 w-4" />
-                                </Button>
-                              </DialogTrigger>
-                              <DialogContent>
-                                <DialogHeader>
-                                  <DialogTitle>Editar Oferta</DialogTitle>
-                                </DialogHeader>
-                                <form onSubmit={handleEditOffer} className="space-y-4">
-                                  <div className="space-y-2">
-                                    <Label htmlFor="edit-title">Título da Oferta</Label>
-                                    <Input
-                                      id="edit-title"
-                                      name="title"
-                                      defaultValue={editingOffer?.title}
-                                      required
-                                    />
-                                  </div>
-                                  <div className="space-y-2">
-                                    <Label htmlFor="edit-description">Descrição</Label>
-                                    <Textarea
-                                      id="edit-description"
-                                      name="description"
-                                      defaultValue={editingOffer?.description}
-                                      required
-                                    />
-                                  </div>
-                                  <div className="space-y-2">
-                                    <Label htmlFor="edit-points">Pontos Necessários</Label>
-                                    <Input
-                                      id="edit-points"
-                                      name="points"
-                                      type="number"
-                                      min="0"
-                                      defaultValue={editingOffer?.pointsRequired}
-                                      required
-                                    />
-                                  </div>
-                                  <div className="space-y-2">
-                                    <Label htmlFor="edit-validUntil">Válido até</Label>
-                                    <Input
-                                      id="edit-validUntil"
-                                      name="validUntil"
-                                      type="date"
-                                      defaultValue={editingOffer?.validUntil.toISOString().split('T')[0]}
-                                      required
-                                    />
-                                  </div>
-                                  <Button type="submit" className="w-full">
-                                    Salvar Alterações
-                                  </Button>
-                                </form>
-                              </DialogContent>
-                            </Dialog>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => toggleOfferStatus(offer.id)}
-                            >
-                              <XOctagon className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {offers.map((offer) => (
+                  <OfferCard
+                    key={offer.id}
+                    offer={offer}
+                    onEdit={setEditingOffer}
+                    onToggleStatus={toggleOfferStatus}
+                  />
+                ))}
               </div>
+
+              <Dialog open={!!editingOffer} onOpenChange={() => setEditingOffer(null)}>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Editar Oferta</DialogTitle>
+                  </DialogHeader>
+                  <form onSubmit={handleEditOffer} className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="edit-title">Título da Oferta</Label>
+                      <Input
+                        id="edit-title"
+                        name="title"
+                        defaultValue={editingOffer?.title}
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="edit-description">Descrição</Label>
+                      <Textarea
+                        id="edit-description"
+                        name="description"
+                        defaultValue={editingOffer?.description}
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="edit-points">Pontos Necessários</Label>
+                      <Input
+                        id="edit-points"
+                        name="points"
+                        type="number"
+                        min="0"
+                        defaultValue={editingOffer?.pointsRequired}
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="edit-validUntil">Válido até</Label>
+                      <Input
+                        id="edit-validUntil"
+                        name="validUntil"
+                        type="date"
+                        defaultValue={editingOffer?.validUntil.toISOString().split('T')[0]}
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="edit-image">URL da Imagem</Label>
+                      <Input
+                        id="edit-image"
+                        name="image"
+                        type="url"
+                        defaultValue={editingOffer?.image}
+                        placeholder="https://exemplo.com/imagem.jpg"
+                      />
+                    </div>
+                    <Button type="submit" className="w-full">
+                      Salvar Alterações
+                    </Button>
+                  </form>
+                </DialogContent>
+              </Dialog>
             </div>
           </ResizablePanel>
         </ResizablePanelGroup>

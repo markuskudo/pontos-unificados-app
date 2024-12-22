@@ -18,6 +18,11 @@ export interface Merchant extends User {
 export interface Customer extends User {
   totalPoints: number;
   enrolledStores: string[];
+  pointsPerStore: {
+    storeId: string;
+    storeName: string;
+    points: number;
+  }[];
 }
 
 export interface Product {
@@ -38,4 +43,5 @@ export interface Offer {
   pointsRequired: number;
   validUntil: Date;
   active: boolean;
+  image?: string;
 }
