@@ -44,6 +44,18 @@ export const mockUsers: Record<string, User | Merchant | Customer> = {
     createdAt: new Date("2024-02-01"),
     totalPoints: 1500,
     enrolledStores: ["merchant-1", "merchant-2"],
+    pointsPerStore: [
+      {
+        storeId: "merchant-1",
+        storeName: "Supermercado Economia",
+        points: 1000
+      },
+      {
+        storeId: "merchant-2",
+        storeName: "Farmácia Saúde",
+        points: 500
+      }
+    ]
   },
   "customer-2": {
     id: "customer-2",
@@ -53,6 +65,13 @@ export const mockUsers: Record<string, User | Merchant | Customer> = {
     createdAt: new Date("2024-02-05"),
     totalPoints: 800,
     enrolledStores: ["merchant-1"],
+    pointsPerStore: [
+      {
+        storeId: "merchant-1",
+        storeName: "Supermercado Economia",
+        points: 800
+      }
+    ]
   },
 };
 

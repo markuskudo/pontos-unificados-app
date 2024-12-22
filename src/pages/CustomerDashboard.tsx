@@ -48,7 +48,7 @@ const CustomerDashboard = () => {
               
               <div className="mt-4 space-y-2">
                 <p className="font-medium text-sm text-muted-foreground">Pontos por Loja:</p>
-                {customer.pointsPerStore.map((store) => (
+                {customer.pointsPerStore?.map((store) => (
                   <div key={store.storeId} className="flex justify-between items-center">
                     <span className="text-sm">{store.storeName}</span>
                     <span className="font-medium">{store.points} pts</span>
