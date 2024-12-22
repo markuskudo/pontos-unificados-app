@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { db } from "@/db/mockDb";
 import { Customer, Merchant } from "@/types";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Settings } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -10,9 +12,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Search } from "lucide-react";
 
 const CustomerDashboard = () => {
+  const navigate = useNavigate();
   const [customer, setCustomer] = useState<Customer | null>(null);
   const [searchCity, setSearchCity] = useState("");
   const [merchants, setMerchants] = useState<Merchant[]>([]);
@@ -35,7 +37,17 @@ const CustomerDashboard = () => {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto p-4 lg:p-6">
-        <h1 className="text-2xl lg:text-3xl font-bold mb-6 lg:mb-8">Painel do Cliente</h1>
+        <div className="mb-6 flex items-center justify-between">
+          <h1 className="text-2xl lg:text-3xl font-bold">Painel do Cliente</h1>
+          <Button
+            variant="outline"
+            onClick={() => navigate("/customer/settings")}
+            className="flex items-center gap-2"
+          >
+            <Settings className="h-4 w-4" />
+            Configurações
+          </Button>
+        </div>
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           <Card>
@@ -47,9 +59,14 @@ const CustomerDashboard = () => {
               <p className="text-3xl font-bold">{customer.totalPoints}</p>
               
               <div className="mt-4 space-y-2">
-                <p className="font-medium text-sm text-muted-foreground">Pontos por Loja:</p>
+                <p className="font-medium text-sm text-muted-foreground">
+                  Pontos por Loja:
+                </p>
                 {customer.pointsPerStore?.map((store) => (
-                  <div key={store.storeId} className="flex justify-between items-center">
+                  <div
+                    key={store.storeId}
+                    className="flex justify-between items-center"
+                  >
                     <span className="text-sm">{store.storeName}</span>
                     <span className="font-medium">{store.points} pts</span>
                   </div>
@@ -61,7 +78,9 @@ const CustomerDashboard = () => {
           <Card className="md:col-span-2">
             <CardHeader>
               <CardTitle>Buscar Lojas</CardTitle>
-              <CardDescription>Encontre lojas participantes na sua cidade</CardDescription>
+              <CardDescription>
+                Encontre lojas participantes na sua cidade
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="flex flex-col sm:flex-row gap-4">
@@ -72,7 +91,6 @@ const CustomerDashboard = () => {
                   className="flex-1"
                 />
                 <Button onClick={handleSearch} className="w-full sm:w-auto">
-                  <Search className="mr-2 h-4 w-4" />
                   Buscar
                 </Button>
               </div>
