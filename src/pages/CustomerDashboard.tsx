@@ -1,27 +1,21 @@
 import { useEffect, useState } from "react";
 import { db } from "@/db/mockDb";
 import { Customer, Merchant } from "@/types";
-import {
-  ResizablePanelGroup,
-  ResizablePanel,
-  ResizableHandle,
-} from "@/components/ui/resizable";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Search } from "lucide-react";
 
 const CustomerDashboard = () => {
-  const [citySearch, setCitySearch] = useState("");
-  const [merchants, setMerchants] = useState<Merchant[]>([]);
   const [customer, setCustomer] = useState<Customer | null>(null);
+  const [searchCity, setSearchCity] = useState("");
+  const [merchants, setMerchants] = useState<Merchant[]>([]);
 
   useEffect(() => {
     // Simulando busca do cliente logado
@@ -30,8 +24,8 @@ const CustomerDashboard = () => {
   }, []);
 
   const handleSearch = () => {
-    if (citySearch.trim()) {
-      const foundMerchants = db.findMerchantsByCity(citySearch);
+    if (searchCity.trim()) {
+      const foundMerchants = db.findMerchantsByCity(searchCity);
       setMerchants(foundMerchants);
     }
   };
@@ -40,81 +34,63 @@ const CustomerDashboard = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto p-6">
-        <h1 className="text-3xl font-bold mb-8">Painel do Cliente</h1>
+      <div className="container mx-auto p-4 lg:p-6">
+        <h1 className="text-2xl lg:text-3xl font-bold mb-6 lg:mb-8">Painel do Cliente</h1>
 
-        <ResizablePanelGroup direction="horizontal" className="min-h-[500px]">
-          <ResizablePanel defaultSize={30}>
-            <div className="p-6 border rounded-lg h-full">
-              <h2 className="text-xl font-semibold mb-4">Meu Perfil</h2>
-              <div className="space-y-4">
-                <div>
-                  <p className="text-sm text-muted-foreground">Nome</p>
-                  <p className="font-medium">{customer.name}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">E-mail</p>
-                  <p className="font-medium">{customer.email}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Total de Pontos</p>
-                  <p className="font-medium text-xl text-primary">
-                    {customer.totalPoints} pts
-                  </p>
-                </div>
-              </div>
-            </div>
-          </ResizablePanel>
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <Card>
+            <CardHeader>
+              <CardTitle>Pontos Acumulados</CardTitle>
+              <CardDescription>Total de pontos disponíveis</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-3xl font-bold">{customer.totalPoints}</p>
+            </CardContent>
+          </Card>
 
-          <ResizableHandle />
-
-          <ResizablePanel defaultSize={70}>
-            <div className="p-6 border rounded-lg h-full">
-              <h2 className="text-xl font-semibold mb-4">Buscar Lojas</h2>
-              
-              <div className="flex gap-2 mb-6">
+          <Card className="md:col-span-2">
+            <CardHeader>
+              <CardTitle>Buscar Lojas</CardTitle>
+              <CardDescription>Encontre lojas participantes na sua cidade</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-col sm:flex-row gap-4">
                 <Input
                   placeholder="Digite o nome da cidade..."
-                  value={citySearch}
-                  onChange={(e) => setCitySearch(e.target.value)}
+                  value={searchCity}
+                  onChange={(e) => setSearchCity(e.target.value)}
+                  className="flex-1"
                 />
-                <Button onClick={handleSearch}>
-                  <Search className="mr-2" />
+                <Button onClick={handleSearch} className="w-full sm:w-auto">
+                  <Search className="mr-2 h-4 w-4" />
                   Buscar
                 </Button>
               </div>
 
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Loja</TableHead>
-                    <TableHead>Cidade</TableHead>
-                    <TableHead>Ação</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {merchants.map((merchant) => (
-                    <TableRow key={merchant.id}>
-                      <TableCell>{merchant.storeName}</TableCell>
-                      <TableCell>{merchant.city}</TableCell>
-                      <TableCell>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          disabled={customer.enrolledStores.includes(merchant.id)}
-                        >
-                          {customer.enrolledStores.includes(merchant.id)
-                            ? "Inscrito"
-                            : "Inscrever-se"}
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          </ResizablePanel>
-        </ResizablePanelGroup>
+              <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {merchants.map((merchant) => (
+                  <Card key={merchant.id}>
+                    <CardHeader>
+                      <CardTitle className="text-lg">{merchant.storeName}</CardTitle>
+                      <CardDescription>{merchant.city}</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <Button
+                        variant="secondary"
+                        className="w-full"
+                        disabled={customer.enrolledStores.includes(merchant.id)}
+                      >
+                        {customer.enrolledStores.includes(merchant.id)
+                          ? "Já Cadastrado"
+                          : "Cadastrar"}
+                      </Button>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );

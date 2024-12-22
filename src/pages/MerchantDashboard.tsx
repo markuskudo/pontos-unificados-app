@@ -26,10 +26,12 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
+import { Edit, XOctagon } from "lucide-react";
 
 const MerchantDashboard = () => {
   const [merchant, setMerchant] = useState<Merchant | null>(null);
   const [offers, setOffers] = useState<Offer[]>([]);
+  const [editingOffer, setEditingOffer] = useState<Offer | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -64,17 +66,51 @@ const MerchantDashboard = () => {
     });
   };
 
+  const handleEditOffer = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    
+    if (!editingOffer) return;
+
+    const updatedOffer: Offer = {
+      ...editingOffer,
+      title: formData.get("title") as string,
+      description: formData.get("description") as string,
+      pointsRequired: Number(formData.get("points")),
+      validUntil: new Date(formData.get("validUntil") as string),
+    };
+
+    setOffers(offers.map(offer => 
+      offer.id === updatedOffer.id ? updatedOffer : offer
+    ));
+    setEditingOffer(null);
+    toast({
+      title: "Oferta atualizada com sucesso!",
+      description: "As alterações foram salvas.",
+    });
+  };
+
+  const toggleOfferStatus = (offerId: string) => {
+    setOffers(offers.map(offer => 
+      offer.id === offerId ? { ...offer, active: !offer.active } : offer
+    ));
+    toast({
+      title: "Status da oferta atualizado",
+      description: "A oferta foi atualizada com sucesso.",
+    });
+  };
+
   if (!merchant) return null;
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto p-6">
-        <h1 className="text-3xl font-bold mb-8">Painel do Lojista</h1>
+      <div className="container mx-auto p-4 lg:p-6">
+        <h1 className="text-2xl lg:text-3xl font-bold mb-6 lg:mb-8">Painel do Lojista</h1>
 
-        <ResizablePanelGroup direction="horizontal" className="min-h-[500px]">
-          <ResizablePanel defaultSize={30}>
-            <div className="p-6 border rounded-lg h-full">
-              <h2 className="text-xl font-semibold mb-4">Informações da Loja</h2>
+        <ResizablePanelGroup direction="horizontal" className="min-h-[500px] rounded-lg border">
+          <ResizablePanel defaultSize={30} minSize={25} maxSize={40}>
+            <div className="p-4 lg:p-6 h-full">
+              <h2 className="text-lg lg:text-xl font-semibold mb-4">Informações da Loja</h2>
               <div className="space-y-4">
                 <div>
                   <p className="text-sm text-muted-foreground">Nome da Loja</p>
@@ -101,9 +137,9 @@ const MerchantDashboard = () => {
           <ResizableHandle />
 
           <ResizablePanel defaultSize={70}>
-            <div className="p-6 border rounded-lg h-full">
+            <div className="p-4 lg:p-6 h-full">
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-semibold">Minhas Ofertas</h2>
+                <h2 className="text-lg lg:text-xl font-semibold">Minhas Ofertas</h2>
                 <Dialog>
                   <DialogTrigger asChild>
                     <Button>Nova Oferta</Button>
@@ -159,36 +195,110 @@ const MerchantDashboard = () => {
                 </Dialog>
               </div>
 
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Título</TableHead>
-                    <TableHead>Descrição</TableHead>
-                    <TableHead>Pontos Necessários</TableHead>
-                    <TableHead>Validade</TableHead>
-                    <TableHead>Status</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {offers.map((offer) => (
-                    <TableRow key={offer.id}>
-                      <TableCell>{offer.title}</TableCell>
-                      <TableCell>{offer.description}</TableCell>
-                      <TableCell>{offer.pointsRequired} pts</TableCell>
-                      <TableCell>
-                        {offer.validUntil.toLocaleDateString("pt-BR")}
-                      </TableCell>
-                      <TableCell>
-                        {offer.active ? (
-                          <span className="text-green-600">Ativa</span>
-                        ) : (
-                          <span className="text-red-600">Inativa</span>
-                        )}
-                      </TableCell>
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Título</TableHead>
+                      <TableHead className="hidden md:table-cell">Descrição</TableHead>
+                      <TableHead>Pontos</TableHead>
+                      <TableHead className="hidden md:table-cell">Validade</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Ações</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {offers.map((offer) => (
+                      <TableRow key={offer.id}>
+                        <TableCell>{offer.title}</TableCell>
+                        <TableCell className="hidden md:table-cell">{offer.description}</TableCell>
+                        <TableCell>{offer.pointsRequired} pts</TableCell>
+                        <TableCell className="hidden md:table-cell">
+                          {offer.validUntil.toLocaleDateString("pt-BR")}
+                        </TableCell>
+                        <TableCell>
+                          {offer.active ? (
+                            <span className="text-green-600">Ativa</span>
+                          ) : (
+                            <span className="text-red-600">Inativa</span>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex gap-2">
+                            <Dialog>
+                              <DialogTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => setEditingOffer(offer)}
+                                >
+                                  <Edit className="h-4 w-4" />
+                                </Button>
+                              </DialogTrigger>
+                              <DialogContent>
+                                <DialogHeader>
+                                  <DialogTitle>Editar Oferta</DialogTitle>
+                                </DialogHeader>
+                                <form onSubmit={handleEditOffer} className="space-y-4">
+                                  <div className="space-y-2">
+                                    <Label htmlFor="edit-title">Título da Oferta</Label>
+                                    <Input
+                                      id="edit-title"
+                                      name="title"
+                                      defaultValue={editingOffer?.title}
+                                      required
+                                    />
+                                  </div>
+                                  <div className="space-y-2">
+                                    <Label htmlFor="edit-description">Descrição</Label>
+                                    <Textarea
+                                      id="edit-description"
+                                      name="description"
+                                      defaultValue={editingOffer?.description}
+                                      required
+                                    />
+                                  </div>
+                                  <div className="space-y-2">
+                                    <Label htmlFor="edit-points">Pontos Necessários</Label>
+                                    <Input
+                                      id="edit-points"
+                                      name="points"
+                                      type="number"
+                                      min="0"
+                                      defaultValue={editingOffer?.pointsRequired}
+                                      required
+                                    />
+                                  </div>
+                                  <div className="space-y-2">
+                                    <Label htmlFor="edit-validUntil">Válido até</Label>
+                                    <Input
+                                      id="edit-validUntil"
+                                      name="validUntil"
+                                      type="date"
+                                      defaultValue={editingOffer?.validUntil.toISOString().split('T')[0]}
+                                      required
+                                    />
+                                  </div>
+                                  <Button type="submit" className="w-full">
+                                    Salvar Alterações
+                                  </Button>
+                                </form>
+                              </DialogContent>
+                            </Dialog>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => toggleOfferStatus(offer.id)}
+                            >
+                              <XOctagon className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
             </div>
           </ResizablePanel>
         </ResizablePanelGroup>
