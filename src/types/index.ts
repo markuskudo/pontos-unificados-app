@@ -13,6 +13,8 @@ export interface Merchant extends User {
   city: string;
   points: number;
   active: boolean;
+  address?: string;
+  whatsapp?: string;
 }
 
 export interface Customer extends User {

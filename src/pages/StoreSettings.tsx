@@ -1,32 +1,45 @@
-import { useState, useEffect } from "react";
-import { Merchant } from "@/types";
-import { db } from "@/db/mockDb";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { Merchant } from "@/types";
+import { db } from "@/db/mockDb";
 
 const StoreSettings = () => {
   const [merchant, setMerchant] = useState<Merchant | null>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const mockMerchant = db.findUserByEmail("joao@supermercado.com") as Merchant;
-    setMerchant(mockMerchant);
-  }, []);
+  const [formData, setFormData] = useState({
+    storeName: merchant?.storeName || "",
+    address: "",
+    city: merchant?.city || "",
+    whatsapp: "",
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (formData.newPassword && formData.newPassword !== formData.confirmPassword) {
+      toast({
+        title: "Erro",
+        description: "As senhas não coincidem",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Em um ambiente real, enviaríamos essas alterações para o backend
     toast({
       title: "Alterações salvas",
       description: "As informações da loja foram atualizadas com sucesso.",
     });
   };
-
-  if (!merchant) return null;
 
   return (
     <div className="container mx-auto p-4 lg:p-6">
@@ -48,8 +61,24 @@ const StoreSettings = () => {
               <Label htmlFor="storeName">Nome da Loja</Label>
               <Input
                 id="storeName"
-                defaultValue={merchant.storeName}
+                value={formData.storeName}
+                onChange={(e) =>
+                  setFormData({ ...formData, storeName: e.target.value })
+                }
                 className="mt-1"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="address">Endereço Completo</Label>
+              <Input
+                id="address"
+                value={formData.address}
+                onChange={(e) =>
+                  setFormData({ ...formData, address: e.target.value })
+                }
+                className="mt-1"
+                placeholder="Rua, número, complemento, bairro"
               />
             </div>
 
@@ -57,19 +86,71 @@ const StoreSettings = () => {
               <Label htmlFor="city">Cidade</Label>
               <Input
                 id="city"
-                defaultValue={merchant.city}
+                value={formData.city}
+                onChange={(e) =>
+                  setFormData({ ...formData, city: e.target.value })
+                }
                 className="mt-1"
               />
             </div>
 
             <div>
-              <Label htmlFor="email">E-mail</Label>
+              <Label htmlFor="whatsapp">WhatsApp</Label>
               <Input
-                id="email"
-                type="email"
-                defaultValue={merchant.email}
+                id="whatsapp"
+                type="tel"
+                value={formData.whatsapp}
+                onChange={(e) =>
+                  setFormData({ ...formData, whatsapp: e.target.value })
+                }
                 className="mt-1"
+                placeholder="(00) 00000-0000"
               />
+            </div>
+
+            <div className="border-t pt-6">
+              <h2 className="text-lg font-semibold mb-4">Alterar Senha</h2>
+              
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="currentPassword">Senha Atual</Label>
+                  <Input
+                    id="currentPassword"
+                    type="password"
+                    value={formData.currentPassword}
+                    onChange={(e) =>
+                      setFormData({ ...formData, currentPassword: e.target.value })
+                    }
+                    className="mt-1"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="newPassword">Nova Senha</Label>
+                  <Input
+                    id="newPassword"
+                    type="password"
+                    value={formData.newPassword}
+                    onChange={(e) =>
+                      setFormData({ ...formData, newPassword: e.target.value })
+                    }
+                    className="mt-1"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="confirmPassword">Confirmar Nova Senha</Label>
+                  <Input
+                    id="confirmPassword"
+                    type="password"
+                    value={formData.confirmPassword}
+                    onChange={(e) =>
+                      setFormData({ ...formData, confirmPassword: e.target.value })
+                    }
+                    className="mt-1"
+                  />
+                </div>
+              </div>
             </div>
           </div>
 
