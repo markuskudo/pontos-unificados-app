@@ -1,11 +1,6 @@
 import { useEffect, useState } from "react";
 import { db } from "@/db/mockDb";
 import { Merchant, Offer } from "@/types";
-import {
-  ResizablePanelGroup,
-  ResizablePanel,
-  ResizableHandle,
-} from "@/components/ui/resizable";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -17,15 +12,18 @@ import {
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/components/ui/use-toast";
-import { StoreInfo } from "@/components/merchant/StoreInfo";
+import { useToast } from "@/hooks/use-toast";
 import { OfferCard } from "@/components/merchant/OfferCard";
+import { CustomerSearch } from "@/components/merchant/CustomerSearch";
+import { Settings } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const MerchantDashboard = () => {
   const [merchant, setMerchant] = useState<Merchant | null>(null);
   const [offers, setOffers] = useState<Offer[]>([]);
   const [editingOffer, setEditingOffer] = useState<Offer | null>(null);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const mockMerchant = db.findUserByEmail("joao@supermercado.com") as Merchant;
@@ -99,158 +97,158 @@ const MerchantDashboard = () => {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto p-4 lg:p-6">
-        <h1 className="text-2xl lg:text-3xl font-bold mb-6 lg:mb-8">Painel do Lojista</h1>
+        <div className="flex justify-between items-center mb-6 lg:mb-8">
+          <h1 className="text-2xl lg:text-3xl font-bold">Painel do Lojista</h1>
+          <Button variant="outline" onClick={() => navigate("/merchant/settings")}>
+            <Settings className="h-4 w-4 mr-2" />
+            Configurações
+          </Button>
+        </div>
 
-        <ResizablePanelGroup direction="horizontal" className="min-h-[500px] rounded-lg border">
-          <ResizablePanel defaultSize={30} minSize={25} maxSize={40}>
-            <StoreInfo merchant={merchant} />
-          </ResizablePanel>
+        <div className="grid gap-6 md:grid-cols-2">
+          <CustomerSearch />
 
-          <ResizableHandle />
-
-          <ResizablePanel defaultSize={70}>
-            <div className="p-4 lg:p-6 h-full">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-lg lg:text-xl font-semibold">Minhas Ofertas</h2>
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button>Nova Oferta</Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Criar Nova Oferta</DialogTitle>
-                    </DialogHeader>
-                    <form onSubmit={handleCreateOffer} className="space-y-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="title">Título da Oferta</Label>
-                        <Input
-                          id="title"
-                          name="title"
-                          placeholder="Ex: Desconto em Compras"
-                          required
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="description">Descrição</Label>
-                        <Textarea
-                          id="description"
-                          name="description"
-                          placeholder="Descreva os detalhes da oferta"
-                          required
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="points">Pontos Necessários</Label>
-                        <Input
-                          id="points"
-                          name="points"
-                          type="number"
-                          min="0"
-                          placeholder="Ex: 5000"
-                          required
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="validUntil">Válido até</Label>
-                        <Input
-                          id="validUntil"
-                          name="validUntil"
-                          type="date"
-                          required
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="image">URL da Imagem</Label>
-                        <Input
-                          id="image"
-                          name="image"
-                          type="url"
-                          placeholder="https://exemplo.com/imagem.jpg"
-                        />
-                      </div>
-                      <Button type="submit" className="w-full">
-                        Criar Oferta
-                      </Button>
-                    </form>
-                  </DialogContent>
-                </Dialog>
-              </div>
-
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {offers.map((offer) => (
-                  <OfferCard
-                    key={offer.id}
-                    offer={offer}
-                    onEdit={setEditingOffer}
-                    onToggleStatus={toggleOfferStatus}
-                  />
-                ))}
-              </div>
-
-              <Dialog open={!!editingOffer} onOpenChange={() => setEditingOffer(null)}>
+          <div className="space-y-6">
+            <div className="flex justify-between items-center">
+              <h2 className="text-lg lg:text-xl font-semibold">Minhas Ofertas</h2>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button>Nova Oferta</Button>
+                </DialogTrigger>
                 <DialogContent>
                   <DialogHeader>
-                    <DialogTitle>Editar Oferta</DialogTitle>
+                    <DialogTitle>Criar Nova Oferta</DialogTitle>
                   </DialogHeader>
-                  <form onSubmit={handleEditOffer} className="space-y-4">
+                  <form onSubmit={handleCreateOffer} className="space-y-4">
                     <div className="space-y-2">
-                      <Label htmlFor="edit-title">Título da Oferta</Label>
+                      <Label htmlFor="title">Título da Oferta</Label>
                       <Input
-                        id="edit-title"
+                        id="title"
                         name="title"
-                        defaultValue={editingOffer?.title}
+                        placeholder="Ex: Desconto em Compras"
                         required
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="edit-description">Descrição</Label>
+                      <Label htmlFor="description">Descrição</Label>
                       <Textarea
-                        id="edit-description"
+                        id="description"
                         name="description"
-                        defaultValue={editingOffer?.description}
+                        placeholder="Descreva os detalhes da oferta"
                         required
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="edit-points">Pontos Necessários</Label>
+                      <Label htmlFor="points">Pontos Necessários</Label>
                       <Input
-                        id="edit-points"
+                        id="points"
                         name="points"
                         type="number"
                         min="0"
-                        defaultValue={editingOffer?.pointsRequired}
+                        placeholder="Ex: 5000"
                         required
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="edit-validUntil">Válido até</Label>
+                      <Label htmlFor="validUntil">Válido até</Label>
                       <Input
-                        id="edit-validUntil"
+                        id="validUntil"
                         name="validUntil"
                         type="date"
-                        defaultValue={editingOffer?.validUntil.toISOString().split('T')[0]}
                         required
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="edit-image">URL da Imagem</Label>
+                      <Label htmlFor="image">URL da Imagem</Label>
                       <Input
-                        id="edit-image"
+                        id="image"
                         name="image"
                         type="url"
-                        defaultValue={editingOffer?.image}
                         placeholder="https://exemplo.com/imagem.jpg"
                       />
                     </div>
                     <Button type="submit" className="w-full">
-                      Salvar Alterações
+                      Criar Oferta
                     </Button>
                   </form>
                 </DialogContent>
               </Dialog>
             </div>
-          </ResizablePanel>
-        </ResizablePanelGroup>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              {offers.map((offer) => (
+                <OfferCard
+                  key={offer.id}
+                  offer={offer}
+                  onEdit={setEditingOffer}
+                  onToggleStatus={toggleOfferStatus}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <Dialog open={!!editingOffer} onOpenChange={() => setEditingOffer(null)}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Editar Oferta</DialogTitle>
+            </DialogHeader>
+            <form onSubmit={handleEditOffer} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="edit-title">Título da Oferta</Label>
+                <Input
+                  id="edit-title"
+                  name="title"
+                  defaultValue={editingOffer?.title}
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="edit-description">Descrição</Label>
+                <Textarea
+                  id="edit-description"
+                  name="description"
+                  defaultValue={editingOffer?.description}
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="edit-points">Pontos Necessários</Label>
+                <Input
+                  id="edit-points"
+                  name="points"
+                  type="number"
+                  min="0"
+                  defaultValue={editingOffer?.pointsRequired}
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="edit-validUntil">Válido até</Label>
+                <Input
+                  id="edit-validUntil"
+                  name="validUntil"
+                  type="date"
+                  defaultValue={editingOffer?.validUntil.toISOString().split('T')[0]}
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="edit-image">URL da Imagem</Label>
+                <Input
+                  id="edit-image"
+                  name="image"
+                  type="url"
+                  defaultValue={editingOffer?.image}
+                  placeholder="https://exemplo.com/imagem.jpg"
+                />
+              </div>
+              <Button type="submit" className="w-full">
+                Salvar Alterações
+              </Button>
+            </form>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );
