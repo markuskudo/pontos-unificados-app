@@ -19,12 +19,11 @@ export const CustomerSearch = () => {
   const { toast } = useToast();
 
   const handleSearch = () => {
-    const customer = Object.values(db.mockUsers).find(
-      (user) => user.id === customerId && user.role === "customer"
-    ) as Customer | undefined;
+    // Using findUserByEmail as a temporary way to find users until we implement findUserById
+    const customer = db.findUserByEmail(customerId);
 
-    if (customer) {
-      setCustomerData(customer);
+    if (customer && customer.role === "customer") {
+      setCustomerData(customer as Customer);
       toast({
         title: "Cliente encontrado!",
         description: `Nome: ${customer.name}`,

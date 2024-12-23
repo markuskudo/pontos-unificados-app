@@ -135,6 +135,11 @@ export const db = {
     return Object.values(mockUsers).find((user) => user.email === email);
   },
 
+  // Função para buscar usuário por ID
+  findUserById: (id: string) => {
+    return mockUsers[id] || null;
+  },
+
   // Função para buscar lojistas por cidade
   findMerchantsByCity: (city: string) => {
     return Object.values(mockUsers).filter(
