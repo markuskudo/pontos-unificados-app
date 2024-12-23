@@ -7,6 +7,8 @@ import Index from "./pages/Index";
 import CustomerDashboard from "./pages/CustomerDashboard";
 import CustomerSettings from "./pages/CustomerSettings";
 import MerchantDashboard from "./pages/MerchantDashboard";
+import StoreSettings from "./pages/StoreSettings";
+import VirtualStore from "./pages/VirtualStore";
 
 const queryClient = new QueryClient();
 
@@ -21,6 +23,8 @@ const App = () => (
           <Route path="/customer" element={<CustomerDashboard />} />
           <Route path="/customer/settings" element={<CustomerSettings />} />
           <Route path="/merchant" element={<MerchantDashboard />} />
+          <Route path="/merchant/settings" element={<StoreSettings />} />
+          <Route path="/store" element={<VirtualStore />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>

@@ -13,13 +13,11 @@ const StoreSettings = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    storeName: merchant?.storeName || "",
-    address: "",
-    city: merchant?.city || "",
-    whatsapp: "",
     currentPassword: "",
     newPassword: "",
     confirmPassword: "",
+    address: merchant?.address || "",
+    whatsapp: merchant?.whatsapp || "",
   });
 
   const handleSave = (e: React.FormEvent) => {
@@ -58,18 +56,6 @@ const StoreSettings = () => {
         <form onSubmit={handleSave} className="space-y-6">
           <div className="space-y-4">
             <div>
-              <Label htmlFor="storeName">Nome da Loja</Label>
-              <Input
-                id="storeName"
-                value={formData.storeName}
-                onChange={(e) =>
-                  setFormData({ ...formData, storeName: e.target.value })
-                }
-                className="mt-1"
-              />
-            </div>
-
-            <div>
               <Label htmlFor="address">Endereço Completo</Label>
               <Input
                 id="address"
@@ -79,18 +65,6 @@ const StoreSettings = () => {
                 }
                 className="mt-1"
                 placeholder="Rua, número, complemento, bairro"
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="city">Cidade</Label>
-              <Input
-                id="city"
-                value={formData.city}
-                onChange={(e) =>
-                  setFormData({ ...formData, city: e.target.value })
-                }
-                className="mt-1"
               />
             </div>
 
