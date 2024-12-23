@@ -9,6 +9,9 @@ import CustomerSettings from "./pages/CustomerSettings";
 import MerchantDashboard from "./pages/MerchantDashboard";
 import StoreSettings from "./pages/StoreSettings";
 import VirtualStore from "./pages/VirtualStore";
+import AdminDashboard from "./pages/AdminDashboard";
+import AdminUsers from "./pages/AdminUsers";
+import AdminReports from "./pages/AdminReports";
 
 const queryClient = new QueryClient();
 
@@ -25,6 +28,9 @@ const App = () => (
           <Route path="/merchant" element={<MerchantDashboard />} />
           <Route path="/merchant/settings" element={<StoreSettings />} />
           <Route path="/store" element={<VirtualStore />} />
+          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/admin/users" element={<AdminUsers />} />
+          <Route path="/admin/reports" element={<AdminReports />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>

@@ -1,6 +1,5 @@
 import { User, Merchant, Customer, Product, Offer } from "@/types";
 
-// Dados fictícios para teste
 export const mockUsers: Record<string, User | Merchant | Customer> = {
   // Admin
   "admin-1": {
@@ -130,17 +129,13 @@ export const mockOffers: Record<string, Offer> = {
 
 // Funções auxiliares para simular operações do banco de dados
 export const db = {
-  // Função para buscar usuário por email
+  mockUsers,
   findUserByEmail: (email: string) => {
     return Object.values(mockUsers).find((user) => user.email === email);
   },
-
-  // Função para buscar usuário por ID
   findUserById: (id: string) => {
     return mockUsers[id] || null;
   },
-
-  // Função para buscar lojistas por cidade
   findMerchantsByCity: (city: string) => {
     return Object.values(mockUsers).filter(
       (user) =>
@@ -148,13 +143,9 @@ export const db = {
         (user as Merchant).city.toLowerCase().includes(city.toLowerCase())
     ) as Merchant[];
   },
-
-  // Função para buscar produtos ativos
   getActiveProducts: () => {
     return Object.values(mockProducts).filter((product) => product.active);
   },
-
-  // Função para buscar ofertas ativas de um lojista
   getMerchantOffers: (merchantId: string) => {
     return Object.values(mockOffers).filter(
       (offer) => offer.merchantId === merchantId && offer.active

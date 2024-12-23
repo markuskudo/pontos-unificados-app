@@ -1,0 +1,91 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { ArrowLeft, FileSpreadsheet, FilePdf } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+
+const AdminReports = () => {
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const [reportType, setReportType] = useState("users");
+
+  const handleExportPDF = () => {
+    toast({
+      title: "Exportando PDF",
+      description: "O relatório será gerado em breve.",
+    });
+  };
+
+  const handleExportExcel = () => {
+    toast({
+      title: "Exportando Excel",
+      description: "O relatório será gerado em breve.",
+    });
+  };
+
+  return (
+    <div className="container mx-auto p-6">
+      <div className="flex items-center mb-6">
+        <Button variant="ghost" onClick={() => navigate("/admin")} className="mr-4">
+          <ArrowLeft className="h-4 w-4" />
+        </Button>
+        <h1 className="text-2xl font-bold">Relatórios</h1>
+      </div>
+
+      <div className="mb-6">
+        <Select value={reportType} onValueChange={setReportType}>
+          <SelectTrigger className="w-full md:w-[280px]">
+            <SelectValue placeholder="Selecione o tipo de relatório" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="users">Usuários</SelectItem>
+            <SelectItem value="merchants">Lojistas</SelectItem>
+            <SelectItem value="customers">Clientes</SelectItem>
+            <SelectItem value="offers">Ofertas</SelectItem>
+            <SelectItem value="points">Pontos por Cliente</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="grid md:grid-cols-2 gap-6">
+        <Card className="cursor-pointer hover:bg-gray-50" onClick={handleExportPDF}>
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <FilePdf className="mr-2 h-5 w-5" />
+              Exportar PDF
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground">
+              Gere um relatório detalhado em formato PDF
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card className="cursor-pointer hover:bg-gray-50" onClick={handleExportExcel}>
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <FileSpreadsheet className="mr-2 h-5 w-5" />
+              Exportar Excel
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground">
+              Gere um relatório detalhado em formato Excel
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+};
+
+export default AdminReports;
