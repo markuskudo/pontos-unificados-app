@@ -9,7 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ArrowLeft, FileSpreadsheet, FilePdf } from "lucide-react";
+import { ArrowLeft, FileSpreadsheet, FileText } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const AdminReports = () => {
@@ -59,7 +59,7 @@ const AdminReports = () => {
         <Card className="cursor-pointer hover:bg-gray-50" onClick={handleExportPDF}>
           <CardHeader>
             <CardTitle className="flex items-center">
-              <FilePdf className="mr-2 h-5 w-5" />
+              <FileText className="mr-2 h-5 w-5" />
               Exportar PDF
             </CardTitle>
           </CardHeader>
