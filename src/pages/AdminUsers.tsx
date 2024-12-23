@@ -3,6 +3,13 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Table,
   TableBody,
   TableCell,
@@ -12,16 +19,23 @@ import {
 } from "@/components/ui/table";
 import { ArrowLeft, Search } from "lucide-react";
 import { db } from "@/db/mockDb";
+import { UserRole } from "@/types";
 
 const AdminUsers = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
+  const [filterRole, setFilterRole] = useState<UserRole | "all">("all");
   const users = Object.values(db.mockUsers);
 
-  const filteredUsers = users.filter((user) =>
-    user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.email.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredUsers = users.filter((user) => {
+    const matchesSearch = 
+      user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.email.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesRole = filterRole === "all" || user.role === filterRole;
+
+    return matchesSearch && matchesRole;
+  });
 
   return (
     <div className="container mx-auto p-6">
@@ -32,7 +46,7 @@ const AdminUsers = () => {
         <h1 className="text-2xl font-bold">Gerenciar Usuários</h1>
       </div>
 
-      <div className="flex items-center space-x-2 mb-6">
+      <div className="flex items-center space-x-4 mb-6">
         <div className="relative flex-1">
           <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
@@ -42,6 +56,17 @@ const AdminUsers = () => {
             className="pl-8"
           />
         </div>
+        <Select value={filterRole} onValueChange={(value: UserRole | "all") => setFilterRole(value)}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Filtrar por tipo" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todos</SelectItem>
+            <SelectItem value="merchant">Lojista</SelectItem>
+            <SelectItem value="customer">Cliente</SelectItem>
+            <SelectItem value="admin">Admin</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       <div className="border rounded-lg">
