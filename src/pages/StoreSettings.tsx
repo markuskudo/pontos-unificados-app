@@ -12,11 +12,17 @@ const StoreSettings = () => {
   const [merchant, setMerchant] = useState<Merchant | null>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
+  
   const [formData, setFormData] = useState({
+    companyName: merchant?.storeName || "",
+    cnpj: "",
     currentPassword: "",
     newPassword: "",
     confirmPassword: "",
-    address: merchant?.address || "",
+    street: "",
+    city: "",
+    state: "",
+    zipCode: "",
     whatsapp: merchant?.whatsapp || "",
   });
 
@@ -55,36 +61,111 @@ const StoreSettings = () => {
 
         <form onSubmit={handleSave} className="space-y-6">
           <div className="space-y-4">
-            <div>
-              <Label htmlFor="address">Endereço Completo</Label>
-              <Input
-                id="address"
-                value={formData.address}
-                onChange={(e) =>
-                  setFormData({ ...formData, address: e.target.value })
-                }
-                className="mt-1"
-                placeholder="Rua, número, complemento, bairro"
-              />
+            {/* Informações da Empresa */}
+            <div className="border-b pb-6">
+              <h2 className="text-lg font-semibold mb-4">Informações da Empresa</h2>
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="companyName">Nome da Empresa</Label>
+                  <Input
+                    id="companyName"
+                    value={formData.companyName}
+                    onChange={(e) =>
+                      setFormData({ ...formData, companyName: e.target.value })
+                    }
+                    className="mt-1"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="cnpj">CNPJ</Label>
+                  <Input
+                    id="cnpj"
+                    value={formData.cnpj}
+                    onChange={(e) =>
+                      setFormData({ ...formData, cnpj: e.target.value })
+                    }
+                    className="mt-1"
+                    placeholder="00.000.000/0000-00"
+                  />
+                </div>
+              </div>
             </div>
 
-            <div>
-              <Label htmlFor="whatsapp">WhatsApp</Label>
-              <Input
-                id="whatsapp"
-                type="tel"
-                value={formData.whatsapp}
-                onChange={(e) =>
-                  setFormData({ ...formData, whatsapp: e.target.value })
-                }
-                className="mt-1"
-                placeholder="(00) 00000-0000"
-              />
+            {/* Endereço */}
+            <div className="border-b pb-6">
+              <h2 className="text-lg font-semibold mb-4">Endereço</h2>
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="street">Endereço Completo</Label>
+                  <Input
+                    id="street"
+                    value={formData.street}
+                    onChange={(e) =>
+                      setFormData({ ...formData, street: e.target.value })
+                    }
+                    className="mt-1"
+                    placeholder="Rua, número, complemento"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="city">Cidade</Label>
+                    <Input
+                      id="city"
+                      value={formData.city}
+                      onChange={(e) =>
+                        setFormData({ ...formData, city: e.target.value })
+                      }
+                      className="mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="state">Estado</Label>
+                    <Input
+                      id="state"
+                      value={formData.state}
+                      onChange={(e) =>
+                        setFormData({ ...formData, state: e.target.value })
+                      }
+                      className="mt-1"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <Label htmlFor="zipCode">CEP</Label>
+                  <Input
+                    id="zipCode"
+                    value={formData.zipCode}
+                    onChange={(e) =>
+                      setFormData({ ...formData, zipCode: e.target.value })
+                    }
+                    className="mt-1"
+                    placeholder="00000-000"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="whatsapp">WhatsApp</Label>
+                  <Input
+                    id="whatsapp"
+                    type="tel"
+                    value={formData.whatsapp}
+                    onChange={(e) =>
+                      setFormData({ ...formData, whatsapp: e.target.value })
+                    }
+                    className="mt-1"
+                    placeholder="(00) 00000-0000"
+                  />
+                </div>
+              </div>
             </div>
 
-            <div className="border-t pt-6">
+            {/* Alterar Senha */}
+            <div>
               <h2 className="text-lg font-semibold mb-4">Alterar Senha</h2>
-              
               <div className="space-y-4">
                 <div>
                   <Label htmlFor="currentPassword">Senha Atual</Label>

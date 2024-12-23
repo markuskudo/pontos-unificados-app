@@ -13,7 +13,10 @@ export interface Merchant extends User {
   city: string;
   points: number;
   active: boolean;
-  address?: string;
+  cnpj?: string;
+  street?: string;
+  state?: string;
+  zipCode?: string;
   whatsapp?: string;
 }
 
