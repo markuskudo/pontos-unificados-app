@@ -2,21 +2,13 @@ import { useEffect, useState } from "react";
 import { db } from "@/db/mockDb";
 import { Merchant, Offer } from "@/types";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { OfferCard } from "@/components/merchant/OfferCard";
 import { CustomerSearch } from "@/components/merchant/CustomerSearch";
 import { Settings } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { OfferForm } from "@/components/merchant/OfferForm";
 
 const MerchantDashboard = () => {
   const [merchant, setMerchant] = useState<Merchant | null>(null);
@@ -35,10 +27,7 @@ const MerchantDashboard = () => {
     }
   }, []);
 
-  const handleCreateOffer = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const formData = new FormData(event.currentTarget);
-    
+  const handleCreateOffer = (formData: FormData) => {
     const newOffer: Offer = {
       id: `offer-${offers.length + 1}`,
       merchantId: merchant?.id || "",
@@ -46,9 +35,15 @@ const MerchantDashboard = () => {
       description: formData.get("description") as string,
       pointsRequired: Number(formData.get("points")),
       validUntil: new Date(formData.get("validUntil") as string),
-      image: formData.get("image") as string,
       active: true,
     };
+
+    // In a real application, we would handle the image upload here
+    const imageFile = formData.get("image") as File;
+    if (imageFile) {
+      // Here you would typically upload the image to a storage service
+      console.log("Image file to upload:", imageFile);
+    }
 
     setOffers([...offers, newOffer]);
     toast({
@@ -57,10 +52,7 @@ const MerchantDashboard = () => {
     });
   };
 
-  const handleEditOffer = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const formData = new FormData(event.currentTarget);
-    
+  const handleEditOffer = (formData: FormData) => {
     if (!editingOffer) return;
 
     const updatedOffer: Offer = {
@@ -69,8 +61,13 @@ const MerchantDashboard = () => {
       description: formData.get("description") as string,
       pointsRequired: Number(formData.get("points")),
       validUntil: new Date(formData.get("validUntil") as string),
-      image: formData.get("image") as string,
     };
+
+    // Handle image update similarly to creation
+    const imageFile = formData.get("image") as File;
+    if (imageFile) {
+      console.log("Image file to upload:", imageFile);
+    }
 
     setOffers(offers.map(offer => 
       offer.id === updatedOffer.id ? updatedOffer : offer
@@ -115,63 +112,7 @@ const MerchantDashboard = () => {
                 <DialogTrigger asChild>
                   <Button>Nova Oferta</Button>
                 </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Criar Nova Oferta</DialogTitle>
-                  </DialogHeader>
-                  <form onSubmit={handleCreateOffer} className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="title">Título da Oferta</Label>
-                      <Input
-                        id="title"
-                        name="title"
-                        placeholder="Ex: Desconto em Compras"
-                        required
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="description">Descrição</Label>
-                      <Textarea
-                        id="description"
-                        name="description"
-                        placeholder="Descreva os detalhes da oferta"
-                        required
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="points">Pontos Necessários</Label>
-                      <Input
-                        id="points"
-                        name="points"
-                        type="number"
-                        min="0"
-                        placeholder="Ex: 5000"
-                        required
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="validUntil">Válido até</Label>
-                      <Input
-                        id="validUntil"
-                        name="validUntil"
-                        type="date"
-                        required
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="image">URL da Imagem</Label>
-                      <Input
-                        id="image"
-                        name="image"
-                        type="url"
-                        placeholder="https://exemplo.com/imagem.jpg"
-                      />
-                    </div>
-                    <Button type="submit" className="w-full">
-                      Criar Oferta
-                    </Button>
-                  </form>
-                </DialogContent>
+                <OfferForm onSubmit={handleCreateOffer} />
               </Dialog>
             </div>
 
@@ -189,65 +130,10 @@ const MerchantDashboard = () => {
         </div>
 
         <Dialog open={!!editingOffer} onOpenChange={() => setEditingOffer(null)}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Editar Oferta</DialogTitle>
-            </DialogHeader>
-            <form onSubmit={handleEditOffer} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="edit-title">Título da Oferta</Label>
-                <Input
-                  id="edit-title"
-                  name="title"
-                  defaultValue={editingOffer?.title}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="edit-description">Descrição</Label>
-                <Textarea
-                  id="edit-description"
-                  name="description"
-                  defaultValue={editingOffer?.description}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="edit-points">Pontos Necessários</Label>
-                <Input
-                  id="edit-points"
-                  name="points"
-                  type="number"
-                  min="0"
-                  defaultValue={editingOffer?.pointsRequired}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="edit-validUntil">Válido até</Label>
-                <Input
-                  id="edit-validUntil"
-                  name="validUntil"
-                  type="date"
-                  defaultValue={editingOffer?.validUntil.toISOString().split('T')[0]}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="edit-image">URL da Imagem</Label>
-                <Input
-                  id="edit-image"
-                  name="image"
-                  type="url"
-                  defaultValue={editingOffer?.image}
-                  placeholder="https://exemplo.com/imagem.jpg"
-                />
-              </div>
-              <Button type="submit" className="w-full">
-                Salvar Alterações
-              </Button>
-            </form>
-          </DialogContent>
+          <OfferForm
+            onSubmit={handleEditOffer}
+            editingOffer={editingOffer}
+          />
         </Dialog>
       </div>
     </div>
