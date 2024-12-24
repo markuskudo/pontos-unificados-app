@@ -1,15 +1,16 @@
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, Store, Coins, Award, LogOut } from "lucide-react";
+import { Users, Store, Coins, Award, LogOut, ShoppingBag } from "lucide-react";
 import { db } from "@/db/mockDb";
+import { Customer } from "@/types";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
 
   // Calculate statistics
   const merchants = Object.values(db.mockUsers).filter(user => user.role === "merchant");
-  const customers = Object.values(db.mockUsers).filter(user => user.role === "customer");
+  const customers = Object.values(db.mockUsers).filter(user => user.role === "customer") as Customer[];
   
   const totalPoints = customers.reduce((acc, customer) => acc + customer.totalPoints, 0);
   const usedPoints = 150000; // This would come from a real database
@@ -21,10 +22,16 @@ const AdminDashboard = () => {
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
           Painel do Administrador
         </h1>
-        <Button variant="ghost" onClick={() => navigate("/")}>
-          <LogOut className="mr-2 h-4 w-4" />
-          Sair
-        </Button>
+        <div className="flex gap-4">
+          <Button onClick={() => navigate("/admin/store/new-product")}>
+            <ShoppingBag className="mr-2 h-4 w-4" />
+            Novo Produto
+          </Button>
+          <Button variant="ghost" onClick={() => navigate("/")}>
+            <LogOut className="mr-2 h-4 w-4" />
+            Sair
+          </Button>
+        </div>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">

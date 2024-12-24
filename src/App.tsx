@@ -12,6 +12,7 @@ import VirtualStore from "./pages/VirtualStore";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminUsers from "./pages/AdminUsers";
 import AdminReports from "./pages/AdminReports";
+import NewProduct from "./pages/NewProduct";
 
 const queryClient = new QueryClient();
 
@@ -31,6 +32,7 @@ const App = () => (
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/admin/users" element={<AdminUsers />} />
           <Route path="/admin/reports" element={<AdminReports />} />
+          <Route path="/admin/store/new-product" element={<NewProduct />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
