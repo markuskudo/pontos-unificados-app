@@ -12,12 +12,16 @@ const VirtualStore = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Buscar todas as ofertas ativas
-    const allOffers = Object.values(db.mockOffers)
-      .filter(offer => offer.active);
+    // Get all merchant IDs from mockUsers
+    const merchantIds = Object.values(db.mockUsers)
+      .filter(user => user.role === "merchant")
+      .map(user => user.id);
+
+    // Get offers from all merchants
+    const allOffers = merchantIds.flatMap(id => db.getMerchantOffers(id));
     setOffers(allOffers);
 
-    // Buscar todos os produtos ativos
+    // Get all active products
     const allProducts = db.getActiveProducts();
     setProducts(allProducts);
   }, []);
