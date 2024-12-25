@@ -34,6 +34,8 @@ const MerchantDashboard = () => {
       title: formData.get("title") as string,
       description: formData.get("description") as string,
       pointsRequired: Number(formData.get("points")),
+      totalPrice: Number(formData.get("totalPrice")),
+      pointsPercentage: Number(formData.get("pointsPercentage")),
       validUntil: new Date(formData.get("validUntil") as string),
       active: true,
     };
@@ -52,23 +54,7 @@ const MerchantDashboard = () => {
     });
   };
 
-  const handleEditOffer = (formData: FormData) => {
-    if (!editingOffer) return;
-
-    const updatedOffer: Offer = {
-      ...editingOffer,
-      title: formData.get("title") as string,
-      description: formData.get("description") as string,
-      pointsRequired: Number(formData.get("points")),
-      validUntil: new Date(formData.get("validUntil") as string),
-    };
-
-    // Handle image update similarly to creation
-    const imageFile = formData.get("image") as File;
-    if (imageFile) {
-      console.log("Image file to upload:", imageFile);
-    }
-
+  const handleEditOffer = (updatedOffer: Offer) => {
     setOffers(offers.map(offer => 
       offer.id === updatedOffer.id ? updatedOffer : offer
     ));
@@ -121,7 +107,7 @@ const MerchantDashboard = () => {
                 <OfferCard
                   key={offer.id}
                   offer={offer}
-                  onEdit={setEditingOffer}
+                  onEdit={handleEditOffer}
                   onToggleStatus={toggleOfferStatus}
                 />
               ))}
