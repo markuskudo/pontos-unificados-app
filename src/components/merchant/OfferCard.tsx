@@ -50,7 +50,14 @@ export const OfferCard = ({ offer, onEdit, onToggleStatus }: OfferCardProps) => 
       </CardHeader>
       <CardContent>
         <p className="text-sm text-muted-foreground">{offer.description}</p>
-        <p className="mt-2 font-medium">Pontos: {offer.pointsRequired}</p>
+        <div className="mt-2 space-y-1">
+          <p className="font-medium">
+            Pontos + Dinheiro: {Math.floor(offer.pointsRequired).toLocaleString()} pts + R$ {offer.totalPrice.toFixed(2)}
+          </p>
+          <p className="text-sm text-muted-foreground">
+            ({offer.pointsPercentage}% em pontos)
+          </p>
+        </div>
         {offer.image && (
           <img
             src={offer.image}
@@ -97,19 +104,39 @@ export const OfferCard = ({ offer, onEdit, onToggleStatus }: OfferCardProps) => 
                 }
               />
             </div>
-            <div>
-              <Label htmlFor="points">Pontos Necessários</Label>
-              <Input
-                id="points"
-                type="number"
-                value={editedOffer.pointsRequired}
-                onChange={(e) =>
-                  setEditedOffer({
-                    ...editedOffer,
-                    pointsRequired: Number(e.target.value),
-                  })
-                }
-              />
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="pointsPercentage">Porcentagem em Pontos (%)</Label>
+                <Input
+                  id="pointsPercentage"
+                  type="number"
+                  min="1"
+                  max="99"
+                  value={editedOffer.pointsPercentage}
+                  onChange={(e) =>
+                    setEditedOffer({
+                      ...editedOffer,
+                      pointsPercentage: Number(e.target.value),
+                    })
+                  }
+                />
+              </div>
+              <div>
+                <Label htmlFor="totalPrice">Valor Total (R$)</Label>
+                <Input
+                  id="totalPrice"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={editedOffer.totalPrice}
+                  onChange={(e) =>
+                    setEditedOffer({
+                      ...editedOffer,
+                      totalPrice: Number(e.target.value),
+                    })
+                  }
+                />
+              </div>
             </div>
             <div>
               <Label htmlFor="image">Imagem da Oferta</Label>

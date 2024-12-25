@@ -47,6 +47,8 @@ export interface Offer {
   title: string;
   description: string;
   pointsRequired: number;
+  totalPrice: number;
+  pointsPercentage: number;
   validUntil: Date;
   active: boolean;
   image?: string;
