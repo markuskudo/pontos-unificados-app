@@ -15,7 +15,7 @@ import { useState } from "react";
 
 interface OfferCardProps {
   offer: Offer;
-  onEdit: (offer: Offer) => void;
+  onEdit: (formData: FormData) => void;
   onToggleStatus: (offerId: string) => void;
 }
 
@@ -23,9 +23,10 @@ export const OfferCard = ({ offer, onEdit, onToggleStatus }: OfferCardProps) => 
   const [isEditing, setIsEditing] = useState(false);
   const [editedOffer, setEditedOffer] = useState(offer);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    onEdit(editedOffer);
+    const formData = new FormData(e.currentTarget);
+    onEdit(formData);
     setIsEditing(false);
   };
 
@@ -88,20 +89,16 @@ export const OfferCard = ({ offer, onEdit, onToggleStatus }: OfferCardProps) => 
               <Label htmlFor="title">Título</Label>
               <Input
                 id="title"
-                value={editedOffer.title}
-                onChange={(e) =>
-                  setEditedOffer({ ...editedOffer, title: e.target.value })
-                }
+                name="title"
+                defaultValue={editedOffer.title}
               />
             </div>
             <div>
               <Label htmlFor="description">Descrição</Label>
               <Textarea
                 id="description"
-                value={editedOffer.description}
-                onChange={(e) =>
-                  setEditedOffer({ ...editedOffer, description: e.target.value })
-                }
+                name="description"
+                defaultValue={editedOffer.description}
               />
             </div>
             <div className="grid grid-cols-2 gap-4">
@@ -109,39 +106,39 @@ export const OfferCard = ({ offer, onEdit, onToggleStatus }: OfferCardProps) => 
                 <Label htmlFor="pointsPercentage">Porcentagem em Pontos (%)</Label>
                 <Input
                   id="pointsPercentage"
+                  name="pointsPercentage"
                   type="number"
                   min="1"
                   max="99"
-                  value={editedOffer.pointsPercentage}
-                  onChange={(e) =>
-                    setEditedOffer({
-                      ...editedOffer,
-                      pointsPercentage: Number(e.target.value),
-                    })
-                  }
+                  defaultValue={editedOffer.pointsPercentage}
                 />
               </div>
               <div>
                 <Label htmlFor="totalPrice">Valor Total (R$)</Label>
                 <Input
                   id="totalPrice"
+                  name="totalPrice"
                   type="number"
                   min="0"
                   step="0.01"
-                  value={editedOffer.totalPrice}
-                  onChange={(e) =>
-                    setEditedOffer({
-                      ...editedOffer,
-                      totalPrice: Number(e.target.value),
-                    })
-                  }
+                  defaultValue={editedOffer.totalPrice}
                 />
               </div>
+            </div>
+            <div>
+              <Label htmlFor="validUntil">Válido até</Label>
+              <Input
+                id="validUntil"
+                name="validUntil"
+                type="date"
+                defaultValue={editedOffer.validUntil.toISOString().split('T')[0]}
+              />
             </div>
             <div>
               <Label htmlFor="image">Imagem da Oferta</Label>
               <Input
                 id="image"
+                name="image"
                 type="file"
                 accept="image/*"
                 onChange={handleImageChange}
