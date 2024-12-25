@@ -36,6 +36,7 @@ export interface Product {
   description: string;
   price: number;
   pointsPrice: number;
+  pointsPercentage: number;
   image: string;
   active: boolean;
 }

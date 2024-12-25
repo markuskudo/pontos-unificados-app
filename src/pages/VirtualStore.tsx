@@ -36,7 +36,7 @@ const VirtualStore = () => {
   const handleRedeemProduct = (productId: string) => {
     toast({
       title: "Produto selecionado!",
-      description: "Prossiga com o resgate usando pontos ou dinheiro.",
+      description: "Prossiga com o resgate usando pontos e dinheiro.",
     });
   };
 
@@ -69,41 +69,18 @@ const VirtualStore = () => {
                     </p>
                     <div className="space-y-2">
                       <div className="flex justify-between items-center">
-                        <span className="text-sm">Pontos:</span>
-                        <span className="font-semibold">{product.pointsPrice.toLocaleString()}</span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm">Valor:</span>
-                        <span className="font-semibold">R$ {product.price.toFixed(2)}</span>
-                      </div>
-                      <div className="flex justify-between items-center">
                         <span className="text-sm">Pontos + Dinheiro:</span>
                         <span className="font-semibold">
-                          {Math.floor(product.pointsPrice / 2).toLocaleString()} pts + R$ {(product.price / 2).toFixed(2)}
+                          {Math.floor(product.pointsPrice).toLocaleString()} pts + R$ {product.price.toFixed(2)}
                         </span>
                       </div>
                     </div>
-                    <div className="mt-4 space-y-2">
-                      <Button
-                        className="w-full bg-purple-600 hover:bg-purple-700"
-                        onClick={() => handleRedeemProduct(product.id)}
-                      >
-                        Resgatar com Pontos
-                      </Button>
-                      <Button
-                        variant="outline"
-                        className="w-full border-purple-600 text-purple-600 hover:bg-purple-50"
-                        onClick={() => handleRedeemProduct(product.id)}
-                      >
-                        Comprar
-                      </Button>
-                      <Button
-                        className="w-full bg-gradient-to-r from-purple-500 to-purple-700 hover:from-purple-600 hover:to-purple-800"
-                        onClick={() => handleRedeemProduct(product.id)}
-                      >
-                        Resgatar com Pontos + Dinheiro
-                      </Button>
-                    </div>
+                    <Button
+                      className="w-full mt-4 bg-gradient-to-r from-purple-500 to-purple-700 hover:from-purple-600 hover:to-purple-800"
+                      onClick={() => handleRedeemProduct(product.id)}
+                    >
+                      Resgatar Produto
+                    </Button>
                   </CardContent>
                 </Card>
               ))}

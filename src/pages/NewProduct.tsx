@@ -39,8 +39,8 @@ const NewProduct = () => {
       category: formData.get("category"),
       name: formData.get("name"),
       description: formData.get("description"),
-      points: formData.get("points"),
-      price: formData.get("price"),
+      pointsPercentage: formData.get("pointsPercentage"),
+      totalPrice: formData.get("totalPrice"),
       image,
     });
 
@@ -105,22 +105,23 @@ const NewProduct = () => {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="points">Pontos Necessários</Label>
+              <Label htmlFor="pointsPercentage">Porcentagem em Pontos (%)</Label>
               <Input
-                id="points"
-                name="points"
+                id="pointsPercentage"
+                name="pointsPercentage"
                 type="number"
-                min="0"
-                placeholder="Ex: 5000"
+                min="1"
+                max="99"
+                placeholder="Ex: 70"
                 required
               />
             </div>
 
             <div>
-              <Label htmlFor="price">Valor em R$</Label>
+              <Label htmlFor="totalPrice">Valor Total (R$)</Label>
               <Input
-                id="price"
-                name="price"
+                id="totalPrice"
+                name="totalPrice"
                 type="number"
                 min="0"
                 step="0.01"
