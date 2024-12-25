@@ -1,19 +1,25 @@
 import { useEffect, useState } from "react";
 import { db } from "@/db/mockDb";
-import { Offer } from "@/types";
+import { Offer, Product } from "@/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const VirtualStore = () => {
   const [offers, setOffers] = useState<Offer[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const { toast } = useToast();
 
   useEffect(() => {
-    // Em um ambiente real, buscaríamos todas as ofertas ativas do backend
-    const allOffers = Object.values(db.getMerchantOffers("merchant-1"))
+    // Buscar todas as ofertas ativas
+    const allOffers = Object.values(db.mockOffers)
       .filter(offer => offer.active);
     setOffers(allOffers);
+
+    // Buscar todos os produtos ativos
+    const allProducts = db.getActiveProducts();
+    setProducts(allProducts);
   }, []);
 
   const handleRedeemOffer = (offerId: string) => {
@@ -23,41 +29,93 @@ const VirtualStore = () => {
     });
   };
 
+  const handleRedeemProduct = (productId: string) => {
+    toast({
+      title: "Produto selecionado!",
+      description: "Prossiga com o resgate usando pontos ou dinheiro.",
+    });
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto p-4 lg:p-6">
         <h1 className="text-2xl lg:text-3xl font-bold mb-6">Loja Virtual</h1>
         
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {offers.map((offer) => (
-            <Card key={offer.id} className="overflow-hidden">
-              {offer.image && (
-                <img
-                  src={offer.image}
-                  alt={offer.title}
-                  className="w-full h-48 object-cover"
-                />
-              )}
-              <CardHeader>
-                <CardTitle>{offer.title}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground mb-4">
-                  {offer.description}
-                </p>
-                <p className="font-semibold mb-4">
-                  Pontos necessários: {offer.pointsRequired}
-                </p>
-                <Button
-                  className="w-full"
-                  onClick={() => handleRedeemOffer(offer.id)}
-                >
-                  Resgatar Oferta
-                </Button>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        <Tabs defaultValue="products" className="w-full">
+          <TabsList className="mb-6">
+            <TabsTrigger value="products">Produtos</TabsTrigger>
+            <TabsTrigger value="offers">Ofertas dos Lojistas</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="products">
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {products.map((product) => (
+                <Card key={product.id} className="overflow-hidden">
+                  <img
+                    src={product.image || "/placeholder.svg"}
+                    alt={product.name}
+                    className="w-full h-48 object-cover"
+                  />
+                  <CardHeader>
+                    <CardTitle>{product.name}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      {product.description}
+                    </p>
+                    <div className="space-y-2">
+                      <p className="font-semibold">
+                        Pontos: {product.pointsPrice.toLocaleString()}
+                      </p>
+                      <p className="font-semibold">
+                        Valor: R$ {product.price.toFixed(2)}
+                      </p>
+                    </div>
+                    <Button
+                      className="w-full mt-4"
+                      onClick={() => handleRedeemProduct(product.id)}
+                    >
+                      Resgatar Produto
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="offers">
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {offers.map((offer) => (
+                <Card key={offer.id} className="overflow-hidden">
+                  {offer.image && (
+                    <img
+                      src={offer.image}
+                      alt={offer.title}
+                      className="w-full h-48 object-cover"
+                    />
+                  )}
+                  <CardHeader>
+                    <CardTitle>{offer.title}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      {offer.description}
+                    </p>
+                    <p className="font-semibold mb-4">
+                      Pontos necessários: {offer.pointsRequired.toLocaleString()}
+                    </p>
+                    <Button
+                      className="w-full"
+                      onClick={() => handleRedeemOffer(offer.id)}
+                    >
+                      Resgatar Oferta
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
