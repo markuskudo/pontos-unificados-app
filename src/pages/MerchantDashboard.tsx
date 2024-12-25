@@ -33,14 +33,17 @@ const MerchantDashboard = () => {
       merchantId: merchant?.id || "",
       title: formData.get("title") as string,
       description: formData.get("description") as string,
-      pointsRequired: Number(formData.get("points")),
+      pointsRequired: calculatePointsRequired(
+        Number(formData.get("totalPrice")),
+        Number(formData.get("pointsPercentage"))
+      ),
       totalPrice: Number(formData.get("totalPrice")),
       pointsPercentage: Number(formData.get("pointsPercentage")),
       validUntil: new Date(formData.get("validUntil") as string),
       active: true,
     };
 
-    // In a real application, we would handle the image upload here
+    // Handle image if present
     const imageFile = formData.get("image") as File;
     if (imageFile) {
       // Here you would typically upload the image to a storage service
@@ -54,7 +57,20 @@ const MerchantDashboard = () => {
     });
   };
 
-  const handleEditOffer = (updatedOffer: Offer) => {
+  const handleEditOffer = (formData: FormData) => {
+    const updatedOffer: Offer = {
+      ...editingOffer!,
+      title: formData.get("title") as string,
+      description: formData.get("description") as string,
+      pointsRequired: calculatePointsRequired(
+        Number(formData.get("totalPrice")),
+        Number(formData.get("pointsPercentage"))
+      ),
+      totalPrice: Number(formData.get("totalPrice")),
+      pointsPercentage: Number(formData.get("pointsPercentage")),
+      validUntil: new Date(formData.get("validUntil") as string),
+    };
+
     setOffers(offers.map(offer => 
       offer.id === updatedOffer.id ? updatedOffer : offer
     ));
@@ -63,6 +79,10 @@ const MerchantDashboard = () => {
       title: "Oferta atualizada com sucesso!",
       description: "As alterações foram salvas.",
     });
+  };
+
+  const calculatePointsRequired = (totalPrice: number, pointsPercentage: number) => {
+    return Math.floor((totalPrice * pointsPercentage) / 100 * 100); // Multiply by 100 to convert to points
   };
 
   const toggleOfferStatus = (offerId: string) => {
