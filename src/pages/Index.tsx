@@ -1,10 +1,54 @@
-import { useState } from "react";
-import { RegisterForm } from "@/components/auth/RegisterForm";
-import { LoginForm } from "@/components/auth/LoginForm";
-import { Button } from "@/components/ui/button";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { Auth } from "@supabase/auth-ui-react";
+import { ThemeSupa } from "@supabase/auth-ui-shared";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const Index = () => {
-  const [showLogin, setShowLogin] = useState(true);
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const [session, setSession] = useState(null);
+
+  useEffect(() => {
+    // Check if there's an active session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      if (session) {
+        // Redirect based on user role
+        const userRole = session.user.user_metadata.role || 'customer';
+        switch (userRole) {
+          case 'merchant':
+            navigate('/merchant');
+            break;
+          case 'admin':
+            navigate('/admin');
+            break;
+          default:
+            navigate('/customer');
+        }
+      }
+    });
+
+    // Listen for auth changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+      if (session) {
+        toast({
+          title: "Login realizado com sucesso!",
+          description: "Bem-vindo(a) de volta!",
+        });
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [navigate, toast]);
+
+  if (session) {
+    return null; // User will be redirected by the useEffect
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-primary/5 to-secondary/5">
@@ -19,28 +63,38 @@ const Index = () => {
         </div>
 
         <div className="max-w-md mx-auto">
-          <div className="flex gap-4 mb-6">
-            <Button
-              variant={showLogin ? "default" : "outline"}
-              className="flex-1"
-              onClick={() => setShowLogin(true)}
-            >
-              Login
-            </Button>
-            <Button
-              variant={!showLogin ? "default" : "outline"}
-              className="flex-1"
-              onClick={() => setShowLogin(false)}
-            >
-              Criar Conta
-            </Button>
-          </div>
-
           <div className="bg-white p-8 rounded-lg shadow-lg">
-            <h2 className="text-2xl font-semibold mb-6 text-center">
-              {showLogin ? "Entrar" : "Criar Nova Conta"}
-            </h2>
-            {showLogin ? <LoginForm /> : <RegisterForm />}
+            <Auth
+              supabaseClient={supabase}
+              appearance={{
+                theme: ThemeSupa,
+                variables: {
+                  default: {
+                    colors: {
+                      brand: 'rgb(var(--color-primary))',
+                      brandAccent: 'rgb(var(--color-primary))',
+                    },
+                  },
+                },
+              }}
+              providers={[]}
+              localization={{
+                variables: {
+                  sign_in: {
+                    email_label: 'Email',
+                    password_label: 'Senha',
+                    button_label: 'Entrar',
+                    loading_button_label: 'Entrando...',
+                  },
+                  sign_up: {
+                    email_label: 'Email',
+                    password_label: 'Senha',
+                    button_label: 'Criar conta',
+                    loading_button_label: 'Criando conta...',
+                  },
+                },
+              }}
+            />
           </div>
         </div>
       </div>
