@@ -5,44 +5,30 @@ import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { ShoppingBag, Users, Star } from "lucide-react";
+import { useSession } from "@supabase/auth-helpers-react";
 
 const Index = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [session, setSession] = useState(null);
+  const session = useSession();
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      if (session) {
-        const userRole = session.user.user_metadata.role || 'customer';
-        switch (userRole) {
-          case 'merchant':
-            navigate('/merchant');
-            break;
-          case 'admin':
-            navigate('/admin');
-            break;
-          default:
-            navigate('/customer');
-        }
+    if (session) {
+      const userRole = session.user.user_metadata.role || 'customer';
+      console.log("Session found, redirecting based on role:", userRole);
+      
+      switch (userRole) {
+        case 'merchant':
+          navigate('/merchant');
+          break;
+        case 'admin':
+          navigate('/admin');
+          break;
+        default:
+          navigate('/customer');
       }
-    });
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      if (session) {
-        toast({
-          title: "Login realizado com sucesso!",
-          description: "Bem-vindo(a) de volta!",
-        });
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, [navigate, toast]);
+    }
+  }, [session, navigate]);
 
   if (session) {
     return null;

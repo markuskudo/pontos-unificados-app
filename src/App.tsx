@@ -22,10 +22,15 @@ const ProtectedRoute = ({ children, requiredRole = null }) => {
   const session = useSession();
   
   if (!session) {
+    console.log("No session found, redirecting to /");
     return <Navigate to="/" replace />;
   }
 
-  if (requiredRole && session.user?.user_metadata?.role !== requiredRole) {
+  const userRole = session.user?.user_metadata?.role || 'customer';
+  console.log("User role:", userRole, "Required role:", requiredRole);
+
+  if (requiredRole && userRole !== requiredRole) {
+    console.log("Invalid role, redirecting to /");
     return <Navigate to="/" replace />;
   }
 
