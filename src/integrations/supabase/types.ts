@@ -9,6 +9,201 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      customer_points: {
+        Row: {
+          created_at: string
+          customer_id: string
+          id: string
+          merchant_id: string
+          points: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          customer_id: string
+          id?: string
+          merchant_id: string
+          points?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          customer_id?: string
+          id?: string
+          merchant_id?: string
+          points?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_points_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_points_merchant_id_fkey"
+            columns: ["merchant_id"]
+            isOneToOne: false
+            referencedRelation: "merchants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      merchants: {
+        Row: {
+          active: boolean | null
+          city: string
+          cnpj: string | null
+          created_at: string
+          id: string
+          state: string | null
+          store_name: string
+          street: string | null
+          updated_at: string
+          whatsapp: string | null
+          zip_code: string | null
+        }
+        Insert: {
+          active?: boolean | null
+          city: string
+          cnpj?: string | null
+          created_at?: string
+          id: string
+          state?: string | null
+          store_name: string
+          street?: string | null
+          updated_at?: string
+          whatsapp?: string | null
+          zip_code?: string | null
+        }
+        Update: {
+          active?: boolean | null
+          city?: string
+          cnpj?: string | null
+          created_at?: string
+          id?: string
+          state?: string | null
+          store_name?: string
+          street?: string | null
+          updated_at?: string
+          whatsapp?: string | null
+          zip_code?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "merchants_id_fkey"
+            columns: ["id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      offers: {
+        Row: {
+          active: boolean | null
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string | null
+          merchant_id: string
+          points_percentage: number
+          points_required: number
+          title: string
+          total_price: number
+          updated_at: string
+          valid_until: string
+        }
+        Insert: {
+          active?: boolean | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          merchant_id: string
+          points_percentage: number
+          points_required: number
+          title: string
+          total_price: number
+          updated_at?: string
+          valid_until: string
+        }
+        Update: {
+          active?: boolean | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          merchant_id?: string
+          points_percentage?: number
+          points_required?: number
+          title?: string
+          total_price?: number
+          updated_at?: string
+          valid_until?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "offers_merchant_id_fkey"
+            columns: ["merchant_id"]
+            isOneToOne: false
+            referencedRelation: "merchants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      products: {
+        Row: {
+          active: boolean | null
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string | null
+          merchant_id: string
+          name: string
+          points_percentage: number
+          points_price: number
+          price: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          merchant_id: string
+          name: string
+          points_percentage: number
+          points_price: number
+          price: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          merchant_id?: string
+          name?: string
+          points_percentage?: number
+          points_price?: number
+          price?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "products_merchant_id_fkey"
+            columns: ["merchant_id"]
+            isOneToOne: false
+            referencedRelation: "merchants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string
