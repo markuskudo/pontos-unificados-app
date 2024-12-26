@@ -31,7 +31,15 @@ const ProtectedRoute = ({ children, requiredRole = null }) => {
 
   if (requiredRole && userRole !== requiredRole) {
     console.log("Invalid role, redirecting to /");
-    return <Navigate to="/" replace />;
+    // Redirect to the appropriate dashboard based on user role
+    switch (userRole) {
+      case 'merchant':
+        return <Navigate to="/merchant" replace />;
+      case 'admin':
+        return <Navigate to="/admin" replace />;
+      default:
+        return <Navigate to="/customer" replace />;
+    }
   }
 
   return children;
