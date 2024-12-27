@@ -6,9 +6,10 @@ import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { OfferCard } from "@/components/merchant/OfferCard";
 import { CustomerSearch } from "@/components/merchant/CustomerSearch";
-import { Settings } from "lucide-react";
+import { Settings, LogOut } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { OfferForm } from "@/components/merchant/OfferForm";
+import { useSupabaseClient } from "@supabase/auth-helpers-react";
 
 const MerchantDashboard = () => {
   const [merchant, setMerchant] = useState<Merchant | null>(null);
@@ -16,6 +17,7 @@ const MerchantDashboard = () => {
   const [editingOffer, setEditingOffer] = useState<Offer | null>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const supabase = useSupabaseClient();
 
   useEffect(() => {
     const mockMerchant = db.findUserByEmail("joao@supermercado.com") as Merchant;
@@ -95,6 +97,19 @@ const MerchantDashboard = () => {
     });
   };
 
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      toast({
+        title: "Erro ao sair",
+        description: error.message,
+        variant: "destructive",
+      });
+      return;
+    }
+    navigate("/");
+  };
+
   if (!merchant) return null;
 
   return (
@@ -102,10 +117,20 @@ const MerchantDashboard = () => {
       <div className="container mx-auto p-4 lg:p-6">
         <div className="flex justify-between items-center mb-6 lg:mb-8">
           <h1 className="text-2xl lg:text-3xl font-bold">Painel do Lojista</h1>
-          <Button variant="outline" onClick={() => navigate("/merchant/settings")}>
-            <Settings className="h-4 w-4 mr-2" />
-            Configurações
-          </Button>
+          <div className="flex gap-4">
+            <Button variant="outline" onClick={() => navigate("/merchant/settings")}>
+              <Settings className="h-4 w-4 mr-2" />
+              Configurações
+            </Button>
+            <Button 
+              variant="destructive" 
+              onClick={handleLogout}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              <LogOut className="h-4 w-4 mr-2" />
+              Sair
+            </Button>
+          </div>
         </div>
 
         <div className="grid gap-6 md:grid-cols-2">

@@ -4,9 +4,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, Store, Coins, Award, LogOut, ShoppingBag } from "lucide-react";
 import { db } from "@/db/mockDb";
 import { Customer } from "@/types";
+import { useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useToast } from "@/hooks/use-toast";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
+  const supabase = useSupabaseClient();
+  const { toast } = useToast();
 
   // Calculate statistics
   const merchants = Object.values(db.mockUsers).filter(user => user.role === "merchant");
@@ -15,6 +19,19 @@ const AdminDashboard = () => {
   const totalPoints = customers.reduce((acc, customer) => acc + customer.totalPoints, 0);
   const usedPoints = 150000; // This would come from a real database
   const monthlyRevenue = merchants.length * 99.90; // Assuming R$99.90 monthly fee per merchant
+
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      toast({
+        title: "Erro ao sair",
+        description: error.message,
+        variant: "destructive",
+      });
+      return;
+    }
+    navigate("/");
+  };
 
   return (
     <div className="container mx-auto p-6">
@@ -27,7 +44,11 @@ const AdminDashboard = () => {
             <ShoppingBag className="mr-2 h-4 w-4" />
             Novo Produto
           </Button>
-          <Button variant="ghost" onClick={() => navigate("/")}>
+          <Button 
+            variant="destructive" 
+            onClick={handleLogout}
+            className="bg-red-600 hover:bg-red-700"
+          >
             <LogOut className="mr-2 h-4 w-4" />
             Sair
           </Button>
