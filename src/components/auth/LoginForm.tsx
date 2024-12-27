@@ -4,8 +4,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Eye, EyeOff } from "lucide-react";
-import { db } from "@/db/mockDb";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 
 export const LoginForm = () => {
   const { toast } = useToast();
@@ -19,32 +19,52 @@ export const LoginForm = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    const user = db.findUserByEmail(formData.email);
-    
-    if (user) {
-      // Em um ambiente real, verificaríamos a senha com hash
-      // Por enquanto, apenas simulamos o login bem-sucedido
-      toast({
-        title: "Login realizado com sucesso!",
-        description: `Bem-vindo(a) ${user.name}!`,
+    try {
+      const { data: { user }, error } = await supabase.auth.signInWithPassword({
+        email: formData.email,
+        password: formData.password,
       });
 
-      // Redireciona para o painel apropriado
-      switch (user.role) {
-        case "customer":
-          navigate("/customer");
-          break;
-        case "merchant":
-          navigate("/merchant");
-          break;
-        case "admin":
-          navigate("/admin");
-          break;
+      if (error) {
+        toast({
+          title: "Erro no login",
+          description: "E-mail ou senha incorretos",
+          variant: "destructive",
+        });
+        return;
       }
-    } else {
+
+      if (user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', user.id)
+          .single();
+
+        if (profile) {
+          toast({
+            title: "Login realizado com sucesso!",
+            description: "Bem-vindo(a) de volta!",
+          });
+
+          // Redirect based on user role
+          switch (profile.role) {
+            case "merchant":
+              navigate("/merchant");
+              break;
+            case "admin":
+              navigate("/admin");
+              break;
+            default:
+              navigate("/customer");
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Error during login:", error);
       toast({
         title: "Erro no login",
-        description: "E-mail ou senha incorretos",
+        description: "Ocorreu um erro ao fazer login. Por favor, tente novamente.",
         variant: "destructive",
       });
     }
