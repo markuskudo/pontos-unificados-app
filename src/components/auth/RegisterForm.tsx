@@ -6,9 +6,12 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/hooks/use-toast";
 import { UserRole } from "@/types";
 import { Eye, EyeOff } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
 
 export const RegisterForm = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formData, setFormData] = useState({
@@ -23,6 +26,7 @@ export const RegisterForm = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
     if (formData.password !== formData.confirmPassword) {
       toast({
         title: "Erro",
@@ -31,11 +35,53 @@ export const RegisterForm = () => {
       });
       return;
     }
-    // Simulando registro
-    toast({
-      title: "Conta criada com sucesso!",
-      description: "Você já pode fazer login no sistema.",
-    });
+
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.password,
+        options: {
+          data: {
+            name: formData.name,
+            role: formData.role,
+            storeName: formData.storeName,
+            city: formData.city,
+          },
+        },
+      });
+
+      if (error) {
+        if (error.message === "User already registered") {
+          toast({
+            title: "Erro no cadastro",
+            description: "Este e-mail já está cadastrado. Por favor, faça login ou use outro e-mail.",
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Erro no cadastro",
+            description: error.message,
+            variant: "destructive",
+          });
+        }
+        return;
+      }
+
+      if (data) {
+        toast({
+          title: "Conta criada com sucesso!",
+          description: "Você já pode fazer login no sistema.",
+        });
+        navigate("/");
+      }
+    } catch (error) {
+      console.error("Error during registration:", error);
+      toast({
+        title: "Erro no cadastro",
+        description: "Ocorreu um erro ao criar sua conta. Por favor, tente novamente.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
