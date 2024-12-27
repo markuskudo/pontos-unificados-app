@@ -6,11 +6,15 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { ShoppingBag, Users, Star } from "lucide-react";
 import { useSession } from "@supabase/auth-helpers-react";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { LoginForm } from "@/components/auth/LoginForm";
 
 const Index = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const session = useSession();
+  const [selectedRole, setSelectedRole] = useState<'customer' | 'merchant' | null>(null);
 
   useEffect(() => {
     if (session) {
@@ -79,52 +83,46 @@ const Index = () => {
         </div>
 
         <div className="max-w-md mx-auto">
-          <div className="bg-white p-8 rounded-xl shadow-lg">
-            <Auth
-              supabaseClient={supabase}
-              appearance={{
-                theme: ThemeSupa,
-                variables: {
-                  default: {
-                    colors: {
-                      brand: '#6D28D9',
-                      brandAccent: '#5B21B6',
-                      brandButtonText: 'white',
-                    },
-                    borderWidths: {
-                      buttonBorderWidth: '1px',
-                    },
-                    radii: {
-                      borderRadiusButton: '8px',
-                      inputBorderRadius: '8px',
-                    },
-                  },
-                },
-                className: {
-                  button: 'bg-primary hover:bg-primary/90 text-white rounded-lg transition-colors',
-                  input: 'rounded-lg border-gray-300 focus:border-primary focus:ring-primary',
-                  label: 'text-gray-700 font-medium',
-                },
-              }}
-              providers={[]}
-              localization={{
-                variables: {
-                  sign_in: {
-                    email_label: 'Email',
-                    password_label: 'Senha',
-                    button_label: 'Entrar',
-                    loading_button_label: 'Entrando...',
-                  },
-                  sign_up: {
-                    email_label: 'Email',
-                    password_label: 'Senha',
-                    button_label: 'Criar conta',
-                    loading_button_label: 'Criando conta...',
-                  },
-                },
-              }}
-            />
-          </div>
+          {!selectedRole ? (
+            <Card className="p-6 space-y-6">
+              <h2 className="text-2xl font-semibold text-center mb-6">Escolha seu perfil</h2>
+              <div className="grid gap-4">
+                <Button 
+                  size="lg"
+                  className="w-full"
+                  onClick={() => setSelectedRole('customer')}
+                >
+                  <Users className="mr-2 h-5 w-5" />
+                  Entrar como Cliente
+                </Button>
+                <Button 
+                  size="lg"
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => setSelectedRole('merchant')}
+                >
+                  <ShoppingBag className="mr-2 h-5 w-5" />
+                  Entrar como Lojista
+                </Button>
+              </div>
+            </Card>
+          ) : (
+            <div className="bg-white p-8 rounded-xl shadow-lg">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-semibold">
+                  {selectedRole === 'customer' ? 'Área do Cliente' : 'Área do Lojista'}
+                </h2>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setSelectedRole(null)}
+                >
+                  Voltar
+                </Button>
+              </div>
+              <LoginForm selectedRole={selectedRole} />
+            </div>
+          )}
         </div>
       </div>
     </div>

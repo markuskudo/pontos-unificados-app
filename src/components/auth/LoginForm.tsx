@@ -7,7 +7,11 @@ import { Eye, EyeOff } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 
-export const LoginForm = () => {
+interface LoginFormProps {
+  selectedRole?: 'customer' | 'merchant' | null;
+}
+
+export const LoginForm = ({ selectedRole = null }: LoginFormProps) => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
@@ -42,6 +46,18 @@ export const LoginForm = () => {
           .single();
 
         if (profile) {
+          // Check if the user's role matches the selected role
+          if (selectedRole && profile.role !== selectedRole) {
+            toast({
+              title: "Acesso negado",
+              description: `Esta conta não está registrada como ${selectedRole === 'customer' ? 'cliente' : 'lojista'}`,
+              variant: "destructive",
+            });
+            // Sign out the user since they tried to log in with the wrong role
+            await supabase.auth.signOut();
+            return;
+          }
+
           toast({
             title: "Login realizado com sucesso!",
             description: "Bem-vindo(a) de volta!",
