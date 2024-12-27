@@ -15,6 +15,7 @@ export const LoginForm = ({ selectedRole = null }: LoginFormProps) => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -22,14 +23,16 @@ export const LoginForm = ({ selectedRole = null }: LoginFormProps) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
     
     try {
-      const { data: { user }, error } = await supabase.auth.signInWithPassword({
+      // First, attempt to sign in
+      const { data: { user }, error: signInError } = await supabase.auth.signInWithPassword({
         email: formData.email,
         password: formData.password,
       });
 
-      if (error) {
+      if (signInError) {
         toast({
           title: "Erro no login",
           description: "E-mail ou senha incorretos",
@@ -39,14 +42,26 @@ export const LoginForm = ({ selectedRole = null }: LoginFormProps) => {
       }
 
       if (user) {
-        const { data: profile } = await supabase
+        // Fetch the user's profile to check their role
+        const { data: profile, error: profileError } = await supabase
           .from('profiles')
           .select('role')
           .eq('id', user.id)
           .single();
 
+        if (profileError) {
+          console.error("Error fetching profile:", profileError);
+          toast({
+            title: "Erro ao verificar perfil",
+            description: "Ocorreu um erro ao verificar seu perfil. Por favor, tente novamente.",
+            variant: "destructive",
+          });
+          await supabase.auth.signOut();
+          return;
+        }
+
         if (profile) {
-          // Check if the user's role matches the selected role
+          // Verify if the user's role matches the selected role
           if (selectedRole && profile.role !== selectedRole) {
             toast({
               title: "Acesso negado",
@@ -83,6 +98,8 @@ export const LoginForm = ({ selectedRole = null }: LoginFormProps) => {
         description: "Ocorreu um erro ao fazer login. Por favor, tente novamente.",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -94,6 +111,7 @@ export const LoginForm = ({ selectedRole = null }: LoginFormProps) => {
           id="email"
           type="email"
           required
+          disabled={isLoading}
           value={formData.email}
           onChange={(e) => setFormData({ ...formData, email: e.target.value })}
         />
@@ -106,6 +124,7 @@ export const LoginForm = ({ selectedRole = null }: LoginFormProps) => {
             id="password"
             type={showPassword ? "text" : "password"}
             required
+            disabled={isLoading}
             value={formData.password}
             onChange={(e) => setFormData({ ...formData, password: e.target.value })}
           />
@@ -113,6 +132,7 @@ export const LoginForm = ({ selectedRole = null }: LoginFormProps) => {
             type="button"
             onClick={() => setShowPassword(!showPassword)}
             className="absolute right-3 top-1/2 -translate-y-1/2"
+            disabled={isLoading}
           >
             {showPassword ? (
               <EyeOff className="h-4 w-4 text-gray-500" />
@@ -123,8 +143,8 @@ export const LoginForm = ({ selectedRole = null }: LoginFormProps) => {
         </div>
       </div>
 
-      <Button type="submit" className="w-full">
-        Entrar
+      <Button type="submit" className="w-full" disabled={isLoading}>
+        {isLoading ? "Entrando..." : "Entrar"}
       </Button>
     </form>
   );
