@@ -38,7 +38,12 @@ export const RegisterForm = () => {
     
     try {
       // Prepare user metadata based on role
-      const metadata = {
+      const metadata: {
+        role: UserRole;
+        name: string;
+        storeName?: string;
+        city?: string;
+      } = {
         role: formData.role,
         name: formData.name,
       };
