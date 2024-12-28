@@ -24,6 +24,7 @@ export const RegisterForm = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
     if (formData.password !== formData.confirmPassword) {
       toast({
         title: "Erro",
@@ -34,27 +35,30 @@ export const RegisterForm = () => {
     }
 
     setLoading(true);
+    
     try {
-      const { data: authData, error: authError } = await supabase.auth.signUp({
+      // Prepare user metadata based on role
+      const metadata = {
+        role: formData.role,
+        name: formData.name,
+      };
+      
+      // Add merchant-specific data only if role is merchant
+      if (formData.role === "merchant") {
+        metadata.storeName = formData.storeName;
+        metadata.city = formData.city;
+      }
+
+      const { error: signUpError } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
         options: {
-          data: {
-            role: formData.role,
-            name: formData.name,
-            storeName: formData.role === "merchant" ? formData.storeName : undefined,
-            city: formData.role === "merchant" ? formData.city : undefined,
-          },
+          data: metadata,
         },
       });
 
-      if (authError) {
-        console.error("Auth error:", authError);
-        throw authError;
-      }
-
-      if (!authData.user) {
-        throw new Error("No user data returned");
+      if (signUpError) {
+        throw signUpError;
       }
 
       toast({
