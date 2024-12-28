@@ -4,13 +4,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Eye, EyeOff } from "lucide-react";
-import { db } from "@/db/mockDb";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 
 export const LoginForm = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -18,19 +19,27 @@ export const LoginForm = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    const user = db.findUserByEmail(formData.email);
-    
-    if (user) {
-      // Em um ambiente real, verificaríamos a senha com hash
-      // Por enquanto, apenas simulamos o login bem-sucedido
-      toast({
-        title: "Login realizado com sucesso!",
-        description: `Bem-vindo(a) ${user.name}!`,
+    setLoading(true);
+
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: formData.email,
+        password: formData.password,
       });
 
-      // Redireciona para o painel apropriado
-      switch (user.role) {
+      if (error) throw error;
+
+      // Buscar o perfil do usuário para determinar o papel
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', data.user.id)
+        .single();
+
+      if (profileError) throw profileError;
+
+      // Redirecionar com base no papel do usuário
+      switch (profileData.role) {
         case "customer":
           navigate("/customer");
           break;
@@ -40,13 +49,22 @@ export const LoginForm = () => {
         case "admin":
           navigate("/admin");
           break;
+        default:
+          throw new Error("Papel de usuário inválido");
       }
-    } else {
+
+      toast({
+        title: "Login realizado com sucesso!",
+        description: "Bem-vindo(a) de volta!",
+      });
+    } catch (error: any) {
       toast({
         title: "Erro no login",
-        description: "E-mail ou senha incorretos",
+        description: error.message || "E-mail ou senha incorretos",
         variant: "destructive",
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -87,8 +105,8 @@ export const LoginForm = () => {
         </div>
       </div>
 
-      <Button type="submit" className="w-full">
-        Entrar
+      <Button type="submit" className="w-full" disabled={loading}>
+        {loading ? "Entrando..." : "Entrar"}
       </Button>
     </form>
   );

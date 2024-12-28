@@ -6,11 +6,15 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/hooks/use-toast";
 import { UserRole } from "@/types";
 import { Eye, EyeOff } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
 
 export const RegisterForm = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -31,11 +35,41 @@ export const RegisterForm = () => {
       });
       return;
     }
-    // Simulando registro
-    toast({
-      title: "Conta criada com sucesso!",
-      description: "Você já pode fazer login no sistema.",
-    });
+
+    setLoading(true);
+    try {
+      // Registrar usuário no Supabase
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.password,
+        options: {
+          data: {
+            role: formData.role,
+            name: formData.name,
+            storeName: formData.storeName,
+            city: formData.city,
+          },
+        },
+      });
+
+      if (authError) throw authError;
+
+      toast({
+        title: "Conta criada com sucesso!",
+        description: "Você já pode fazer login no sistema.",
+      });
+
+      // Redirecionar para a página de login
+      navigate("/");
+    } catch (error: any) {
+      toast({
+        title: "Erro ao criar conta",
+        description: error.message || "Ocorreu um erro ao criar sua conta",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -160,8 +194,8 @@ export const RegisterForm = () => {
         </>
       )}
 
-      <Button type="submit" className="w-full">
-        Criar Conta
+      <Button type="submit" className="w-full" disabled={loading}>
+        {loading ? "Criando conta..." : "Criar Conta"}
       </Button>
     </form>
   );
