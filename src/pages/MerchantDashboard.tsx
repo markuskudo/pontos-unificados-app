@@ -34,16 +34,11 @@ const MerchantDashboard = () => {
       title: formData.get("title") as string,
       description: formData.get("description") as string,
       pointsRequired: Number(formData.get("points")),
+      totalPrice: Number(formData.get("totalPrice") || 0),
+      pointsPercentage: Number(formData.get("pointsPercentage") || 0),
       validUntil: new Date(formData.get("validUntil") as string),
       active: true,
     };
-
-    // In a real application, we would handle the image upload here
-    const imageFile = formData.get("image") as File;
-    if (imageFile) {
-      // Here you would typically upload the image to a storage service
-      console.log("Image file to upload:", imageFile);
-    }
 
     setOffers([...offers, newOffer]);
     toast({
@@ -88,8 +83,6 @@ const MerchantDashboard = () => {
       description: "A oferta foi atualizada com sucesso.",
     });
   };
-
-  if (!merchant) return null;
 
   return (
     <div className="min-h-screen bg-background">

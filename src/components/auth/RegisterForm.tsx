@@ -42,13 +42,20 @@ export const RegisterForm = () => {
           data: {
             role: formData.role,
             name: formData.name,
-            storeName: formData.storeName,
-            city: formData.city,
+            storeName: formData.role === "merchant" ? formData.storeName : undefined,
+            city: formData.role === "merchant" ? formData.city : undefined,
           },
         },
       });
 
-      if (authError) throw authError;
+      if (authError) {
+        console.error("Auth error:", authError);
+        throw authError;
+      }
+
+      if (!authData.user) {
+        throw new Error("No user data returned");
+      }
 
       toast({
         title: "Conta criada com sucesso!",
@@ -57,6 +64,7 @@ export const RegisterForm = () => {
 
       navigate("/");
     } catch (error: any) {
+      console.error("Registration error:", error);
       toast({
         title: "Erro ao criar conta",
         description: error.message || "Ocorreu um erro ao criar sua conta",
