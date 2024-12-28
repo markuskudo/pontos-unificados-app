@@ -1,10 +1,18 @@
 import { useState } from "react";
-import { RegisterForm } from "@/components/auth/RegisterForm";
 import { LoginForm } from "@/components/auth/LoginForm";
 import { Button } from "@/components/ui/button";
+import { CustomerRegisterForm } from "@/components/auth/CustomerRegisterForm";
+import { MerchantRegisterForm } from "@/components/auth/MerchantRegisterForm";
 
 const Index = () => {
   const [showLogin, setShowLogin] = useState(true);
+  const [registerType, setRegisterType] = useState<"customer" | "merchant" | null>(
+    null
+  );
+
+  const handleBackToOptions = () => {
+    setRegisterType(null);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-primary/5 to-secondary/5">
@@ -23,14 +31,20 @@ const Index = () => {
             <Button
               variant={showLogin ? "default" : "outline"}
               className="flex-1"
-              onClick={() => setShowLogin(true)}
+              onClick={() => {
+                setShowLogin(true);
+                setRegisterType(null);
+              }}
             >
               Login
             </Button>
             <Button
               variant={!showLogin ? "default" : "outline"}
               className="flex-1"
-              onClick={() => setShowLogin(false)}
+              onClick={() => {
+                setShowLogin(false);
+                setRegisterType(null);
+              }}
             >
               Criar Conta
             </Button>
@@ -38,9 +52,57 @@ const Index = () => {
 
           <div className="bg-white p-8 rounded-lg shadow-lg">
             <h2 className="text-2xl font-semibold mb-6 text-center">
-              {showLogin ? "Entrar" : "Criar Nova Conta"}
+              {showLogin
+                ? "Entrar"
+                : registerType
+                ? `Criar Conta ${
+                    registerType === "merchant" ? "Lojista" : "Cliente"
+                  }`
+                : "Escolha o tipo de conta"}
             </h2>
-            {showLogin ? <LoginForm /> : <RegisterForm />}
+
+            {showLogin ? (
+              <LoginForm />
+            ) : registerType === null ? (
+              <div className="space-y-4">
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => setRegisterType("customer")}
+                >
+                  Sou Cliente
+                </Button>
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => setRegisterType("merchant")}
+                >
+                  Sou Lojista
+                </Button>
+              </div>
+            ) : registerType === "customer" ? (
+              <div>
+                <CustomerRegisterForm />
+                <Button
+                  variant="link"
+                  className="mt-4 w-full"
+                  onClick={handleBackToOptions}
+                >
+                  Voltar
+                </Button>
+              </div>
+            ) : (
+              <div>
+                <MerchantRegisterForm />
+                <Button
+                  variant="link"
+                  className="mt-4 w-full"
+                  onClick={handleBackToOptions}
+                >
+                  Voltar
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       </div>
