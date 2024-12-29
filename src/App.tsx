@@ -13,6 +13,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import AdminUsers from "./pages/AdminUsers";
 import AdminReports from "./pages/AdminReports";
 import NewProduct from "./pages/NewProduct";
+import MerchantLogin from "./pages/MerchantLogin";
 
 const queryClient = new QueryClient();
 
@@ -26,6 +27,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/customer" element={<CustomerDashboard />} />
           <Route path="/customer/settings" element={<CustomerSettings />} />
+          <Route path="/merchant/login" element={<MerchantLogin />} />
           <Route path="/merchant" element={<MerchantDashboard />} />
           <Route path="/merchant/settings" element={<StoreSettings />} />
           <Route path="/store" element={<VirtualStore />} />
