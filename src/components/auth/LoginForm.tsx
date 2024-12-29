@@ -22,29 +22,31 @@ export const LoginForm = () => {
     setLoading(true);
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { data: authData, error: signInError } = await supabase.auth.signInWithPassword({
         email: formData.email,
         password: formData.password,
       });
 
-      if (error) throw error;
+      if (signInError) throw signInError;
 
       // Buscar o perfil do usuário para determinar o papel
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .select('role')
-        .eq('id', data.user.id)
+        .eq('id', authData.user.id)
         .single();
 
       if (profileError) throw profileError;
 
+      console.log("User role:", profileData.role); // Debug log
+
       // Redirecionar com base no papel do usuário
       switch (profileData.role) {
-        case "customer":
-          navigate("/customer");
-          break;
         case "merchant":
           navigate("/merchant");
+          break;
+        case "customer":
+          navigate("/customer");
           break;
         case "admin":
           navigate("/admin");
@@ -58,6 +60,7 @@ export const LoginForm = () => {
         description: "Bem-vindo(a) de volta!",
       });
     } catch (error: any) {
+      console.error("Login error:", error); // Debug log
       toast({
         title: "Erro no login",
         description: error.message || "E-mail ou senha incorretos",
