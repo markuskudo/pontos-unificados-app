@@ -37,18 +37,26 @@ export const MerchantRegisterForm = () => {
     setLoading(true);
     
     try {
-      const metadata = {
-        role: "merchant" as const,
-        name: formData.name,
-        storeName: formData.storeName,
-        city: formData.city,
-      };
+      console.log("Registering merchant with data:", {
+        email: formData.email,
+        metadata: {
+          role: "merchant",
+          name: formData.name,
+          storeName: formData.storeName,
+          city: formData.city,
+        },
+      });
 
-      const { error: signUpError } = await supabase.auth.signUp({
+      const { data, error: signUpError } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
         options: {
-          data: metadata,
+          data: {
+            role: "merchant",
+            name: formData.name,
+            storeName: formData.storeName,
+            city: formData.city,
+          },
         },
       });
 
@@ -56,12 +64,14 @@ export const MerchantRegisterForm = () => {
         throw signUpError;
       }
 
+      console.log("Registration successful:", data);
+
       toast({
         title: "Conta criada com sucesso!",
         description: "Você já pode fazer login no sistema.",
       });
 
-      navigate("/");
+      navigate("/merchant/login");
     } catch (error: any) {
       console.error("Registration error:", error);
       toast({

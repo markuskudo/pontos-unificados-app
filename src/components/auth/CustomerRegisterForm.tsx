@@ -35,7 +35,15 @@ export const CustomerRegisterForm = () => {
     setLoading(true);
     
     try {
-      const { error: signUpError } = await supabase.auth.signUp({
+      console.log("Registering customer with data:", {
+        email: formData.email,
+        metadata: {
+          role: "customer",
+          name: formData.name,
+        },
+      });
+
+      const { data, error: signUpError } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
         options: {
@@ -49,6 +57,8 @@ export const CustomerRegisterForm = () => {
       if (signUpError) {
         throw signUpError;
       }
+
+      console.log("Registration successful:", data);
 
       toast({
         title: "Conta criada com sucesso!",

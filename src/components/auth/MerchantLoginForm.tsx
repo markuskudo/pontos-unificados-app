@@ -22,12 +22,16 @@ export const MerchantLoginForm = () => {
     setLoading(true);
 
     try {
+      console.log("Attempting login with:", formData.email);
+      
       const { data: authData, error: signInError } = await supabase.auth.signInWithPassword({
         email: formData.email,
         password: formData.password,
       });
 
       if (signInError) throw signInError;
+
+      console.log("Auth successful, checking profile...");
 
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
@@ -37,7 +41,7 @@ export const MerchantLoginForm = () => {
 
       if (profileError) throw profileError;
 
-      console.log("User role:", profileData.role); // Debug log
+      console.log("Profile data:", profileData);
 
       if (profileData.role !== "merchant") {
         throw new Error("Esta área é exclusiva para lojistas");
@@ -50,7 +54,7 @@ export const MerchantLoginForm = () => {
         description: "Bem-vindo(a) de volta!",
       });
     } catch (error: any) {
-      console.error("Login error:", error); // Debug log
+      console.error("Login error:", error);
       toast({
         title: "Erro no login",
         description: error.message || "E-mail ou senha incorretos",
