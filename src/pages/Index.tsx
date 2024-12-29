@@ -1,18 +1,9 @@
 import { useState } from "react";
-import { LoginForm } from "@/components/auth/LoginForm";
 import { Button } from "@/components/ui/button";
-import { CustomerRegisterForm } from "@/components/auth/CustomerRegisterForm";
-import { MerchantRegisterForm } from "@/components/auth/MerchantRegisterForm";
+import { useNavigate } from "react-router-dom";
 
 const Index = () => {
-  const [showLogin, setShowLogin] = useState(true);
-  const [registerType, setRegisterType] = useState<"customer" | "merchant" | null>(
-    null
-  );
-
-  const handleBackToOptions = () => {
-    setRegisterType(null);
-  };
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-primary/5 to-secondary/5">
@@ -27,82 +18,52 @@ const Index = () => {
         </div>
 
         <div className="max-w-md mx-auto">
-          <div className="flex gap-4 mb-6">
-            <Button
-              variant={showLogin ? "default" : "outline"}
-              className="flex-1"
-              onClick={() => {
-                setShowLogin(true);
-                setRegisterType(null);
-              }}
-            >
-              Login
-            </Button>
-            <Button
-              variant={!showLogin ? "default" : "outline"}
-              className="flex-1"
-              onClick={() => {
-                setShowLogin(false);
-                setRegisterType(null);
-              }}
-            >
-              Criar Conta
-            </Button>
-          </div>
-
           <div className="bg-white p-8 rounded-lg shadow-lg">
             <h2 className="text-2xl font-semibold mb-6 text-center">
-              {showLogin
-                ? "Entrar"
-                : registerType
-                ? `Criar Conta ${
-                    registerType === "merchant" ? "Lojista" : "Cliente"
-                  }`
-                : "Escolha o tipo de conta"}
+              Escolha seu perfil
             </h2>
 
-            {showLogin ? (
-              <LoginForm />
-            ) : registerType === null ? (
-              <div className="space-y-4">
-                <Button
-                  variant="outline"
-                  className="w-full"
-                  onClick={() => setRegisterType("customer")}
-                >
-                  Sou Cliente
-                </Button>
-                <Button
-                  variant="outline"
-                  className="w-full"
-                  onClick={() => setRegisterType("merchant")}
-                >
-                  Sou Lojista
-                </Button>
-              </div>
-            ) : registerType === "customer" ? (
+            <div className="space-y-4">
               <div>
-                <CustomerRegisterForm />
-                <Button
-                  variant="link"
-                  className="mt-4 w-full"
-                  onClick={handleBackToOptions}
-                >
-                  Voltar
-                </Button>
+                <h3 className="text-lg font-medium mb-3">Sou Cliente</h3>
+                <div className="space-y-2">
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => navigate("/customer/login")}
+                  >
+                    Entrar
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => navigate("/customer/register")}
+                  >
+                    Criar Conta
+                  </Button>
+                </div>
               </div>
-            ) : (
-              <div>
-                <MerchantRegisterForm />
-                <Button
-                  variant="link"
-                  className="mt-4 w-full"
-                  onClick={handleBackToOptions}
-                >
-                  Voltar
-                </Button>
+
+              <div className="border-t pt-4">
+                <h3 className="text-lg font-medium mb-3">Sou Lojista</h3>
+                <div className="space-y-2">
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => navigate("/merchant/login")}
+                  >
+                    Entrar
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => navigate("/merchant/register")}
+                  >
+                    Criar Conta
+                  </Button>
+                </div>
               </div>
-            )}
+            </div>
           </div>
         </div>
       </div>

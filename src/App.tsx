@@ -6,6 +6,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import CustomerDashboard from "./pages/CustomerDashboard";
 import CustomerSettings from "./pages/CustomerSettings";
+import CustomerLogin from "./pages/CustomerLogin";
+import CustomerRegister from "./pages/CustomerRegister";
 import MerchantDashboard from "./pages/MerchantDashboard";
 import StoreSettings from "./pages/StoreSettings";
 import VirtualStore from "./pages/VirtualStore";
@@ -26,6 +28,8 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/customer/login" element={<CustomerLogin />} />
+          <Route path="/customer/register" element={<CustomerRegister />} />
           <Route path="/customer" element={<CustomerDashboard />} />
           <Route path="/customer/settings" element={<CustomerSettings />} />
           <Route path="/merchant/login" element={<MerchantLogin />} />
