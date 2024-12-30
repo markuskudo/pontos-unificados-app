@@ -16,6 +16,8 @@ export const CustomerRegisterForm = () => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
+    cpf: "",
+    birthday: "",
     password: "",
     confirmPassword: "",
   });
@@ -40,6 +42,8 @@ export const CustomerRegisterForm = () => {
         metadata: {
           role: "customer",
           name: formData.name,
+          cpf: formData.cpf,
+          birthday: formData.birthday,
         },
       });
 
@@ -50,6 +54,8 @@ export const CustomerRegisterForm = () => {
           data: {
             role: "customer",
             name: formData.name,
+            cpf: formData.cpf,
+            birthday: formData.birthday,
           },
         },
       });
@@ -99,6 +105,29 @@ export const CustomerRegisterForm = () => {
           required
           value={formData.email}
           onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="cpf">CPF</Label>
+        <Input
+          id="cpf"
+          type="text"
+          required
+          placeholder="000.000.000-00"
+          value={formData.cpf}
+          onChange={(e) => setFormData({ ...formData, cpf: e.target.value })}
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="birthday">Data de Nascimento</Label>
+        <Input
+          id="birthday"
+          type="date"
+          required
+          value={formData.birthday}
+          onChange={(e) => setFormData({ ...formData, birthday: e.target.value })}
         />
       </div>
 
