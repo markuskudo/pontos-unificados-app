@@ -39,7 +39,7 @@ export const MerchantRegisterForm = () => {
     try {
       console.log("Registering merchant with data:", {
         email: formData.email,
-        metadata: {
+        data: {
           role: "merchant",
           name: formData.name,
           storeName: formData.storeName,
