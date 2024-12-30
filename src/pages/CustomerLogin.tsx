@@ -1,39 +1,36 @@
 import { LoginForm } from "@/components/auth/LoginForm";
-import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
 
 const CustomerLogin = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-primary/5 to-secondary/5">
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-md mx-auto">
-          <div className="bg-white p-8 rounded-lg shadow-lg">
-            <h2 className="text-2xl font-semibold mb-6 text-center">
-              Login do Cliente
-            </h2>
-            <LoginForm />
-            <div className="mt-4 text-center">
-              <p className="text-sm text-gray-600">
-                Ainda não tem uma conta?{" "}
-                <Link
-                  to="/customer/register"
-                  className="text-primary hover:underline"
-                >
-                  Cadastre-se
-                </Link>
-              </p>
-            </div>
-            <div className="mt-6">
-              <Button
-                variant="outline"
-                className="w-full"
-                asChild
-              >
-                <Link to="/">Voltar</Link>
-              </Button>
-            </div>
+    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
+      <div className="w-full max-w-md space-y-8">
+        <div className="space-y-4">
+          <Link
+            to="/"
+            className="inline-flex items-center text-sm text-gray-500 hover:text-gray-700"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Voltar para início
+          </Link>
+          
+          <div>
+            <h1 className="text-2xl font-bold">Login do Cliente</h1>
+            <p className="text-gray-600 mt-2">
+              Entre na sua conta para acessar seus pontos e benefícios
+            </p>
           </div>
         </div>
+
+        <LoginForm />
+
+        <p className="text-center text-sm text-gray-500">
+          Não tem uma conta?{" "}
+          <Link to="/customer/register" className="text-blue-600 hover:underline">
+            Cadastre-se
+          </Link>
+        </p>
       </div>
     </div>
   );
