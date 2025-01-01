@@ -106,17 +106,16 @@ export const OfferCard = ({ offer, onEdit, onToggleStatus }: OfferCardProps) => 
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="pointsPercentage">Porcentagem em Pontos (%)</Label>
+                <Label htmlFor="pointsRequired">Quantidade em Pontos</Label>
                 <Input
-                  id="pointsPercentage"
+                  id="pointsRequired"
                   type="number"
-                  min="1"
-                  max="99"
-                  value={editedOffer.pointsPercentage}
+                  min="0"
+                  value={editedOffer.pointsRequired}
                   onChange={(e) =>
                     setEditedOffer({
                       ...editedOffer,
-                      pointsPercentage: Number(e.target.value),
+                      pointsRequired: Number(e.target.value),
                     })
                   }
                 />

@@ -52,15 +52,14 @@ export const OfferForm = ({ onSubmit, editingOffer }: OfferFormProps) => {
         </div>
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="pointsPercentage">Porcentagem em Pontos (%)</Label>
+            <Label htmlFor="pointsRequired">Quantidade em Pontos</Label>
             <Input
-              id="pointsPercentage"
-              name="pointsPercentage"
+              id="pointsRequired"
+              name="pointsRequired"
               type="number"
-              min="1"
-              max="99"
-              defaultValue={editingOffer?.pointsPercentage}
-              placeholder="Ex: 70"
+              min="0"
+              defaultValue={editingOffer?.pointsRequired}
+              placeholder="Ex: 5000"
               required
             />
           </div>
