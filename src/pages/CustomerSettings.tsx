@@ -21,27 +21,15 @@ const CustomerSettings = () => {
   const customer = db.findUserByEmail("pedro@email.com") as Customer;
 
   const [formData, setFormData] = useState({
-    password: "",
-    confirmPassword: "",
     address: "",
     city: "",
     state: "",
     zipCode: "",
     whatsapp: "",
-    birthDate: "",
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (formData.password !== formData.confirmPassword) {
-      toast({
-        title: "Erro",
-        description: "As senhas não coincidem",
-        variant: "destructive",
-      });
-      return;
-    }
-    
     toast({
       title: "Sucesso",
       description: "Informações atualizadas com sucesso!",
@@ -83,30 +71,6 @@ const CustomerSettings = () => {
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="password">Nova Senha</Label>
-                  <Input
-                    id="password"
-                    type="password"
-                    value={formData.password}
-                    onChange={(e) =>
-                      setFormData({ ...formData, password: e.target.value })
-                    }
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="confirmPassword">Confirmar Nova Senha</Label>
-                  <Input
-                    id="confirmPassword"
-                    type="password"
-                    value={formData.confirmPassword}
-                    onChange={(e) =>
-                      setFormData({ ...formData, confirmPassword: e.target.value })
-                    }
-                  />
-                </div>
-
                 <div className="space-y-2">
                   <Label htmlFor="address">Endereço Completo</Label>
                   <Input
@@ -164,18 +128,6 @@ const CustomerSettings = () => {
                     value={formData.whatsapp}
                     onChange={(e) =>
                       setFormData({ ...formData, whatsapp: e.target.value })
-                    }
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="birthDate">Data de Nascimento</Label>
-                  <Input
-                    id="birthDate"
-                    type="date"
-                    value={formData.birthDate}
-                    onChange={(e) =>
-                      setFormData({ ...formData, birthDate: e.target.value })
                     }
                   />
                 </div>
