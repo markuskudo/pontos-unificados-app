@@ -14,12 +14,12 @@ export const MerchantRegisterForm = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    name: "",
     email: "",
     password: "",
     confirmPassword: "",
     storeName: "",
     city: "",
+    state: "",
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -41,9 +41,9 @@ export const MerchantRegisterForm = () => {
         email: formData.email,
         data: {
           role: "merchant",
-          name: formData.name,
           storeName: formData.storeName,
           city: formData.city,
+          state: formData.state,
         },
       });
 
@@ -53,9 +53,9 @@ export const MerchantRegisterForm = () => {
         options: {
           data: {
             role: "merchant",
-            name: formData.name,
             storeName: formData.storeName,
             city: formData.city,
+            state: formData.state,
           },
         },
       });
@@ -87,17 +87,6 @@ export const MerchantRegisterForm = () => {
   return (
     <form onSubmit={handleSubmit} className="space-y-6 w-full max-w-md">
       <div className="space-y-2">
-        <Label htmlFor="name">Nome Completo</Label>
-        <Input
-          id="name"
-          type="text"
-          required
-          value={formData.name}
-          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-        />
-      </div>
-
-      <div className="space-y-2">
         <Label htmlFor="storeName">Nome da Loja</Label>
         <Input
           id="storeName"
@@ -116,6 +105,17 @@ export const MerchantRegisterForm = () => {
           required
           value={formData.city}
           onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="state">Estado</Label>
+        <Input
+          id="state"
+          type="text"
+          required
+          value={formData.state}
+          onChange={(e) => setFormData({ ...formData, state: e.target.value })}
         />
       </div>
 
