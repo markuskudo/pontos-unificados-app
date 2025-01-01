@@ -50,21 +50,18 @@ export const OfferCard = ({ offer, onEdit, onToggleStatus }: OfferCardProps) => 
       </CardHeader>
       <CardContent>
         <p className="text-sm text-muted-foreground">{offer.description}</p>
-        <div className="mt-2 space-y-1">
-          <p className="font-medium">
-            Pontos + Dinheiro: {Math.floor(offer.pointsRequired).toLocaleString()} pts + R$ {offer.totalPrice.toFixed(2)}
-          </p>
-          <p className="text-sm text-muted-foreground">
-            ({offer.pointsPercentage}% em pontos)
-          </p>
-        </div>
         {offer.image && (
           <img
             src={offer.image}
             alt={offer.title}
-            className="mt-2 w-full h-32 object-cover rounded"
+            className="mt-4 w-full h-32 object-cover rounded"
           />
         )}
+        <div className="mt-4">
+          <p className="font-medium">
+            Pontos + Dinheiro: {Math.floor(offer.pointsRequired).toLocaleString()} pts + R$ {offer.totalPrice.toFixed(2)}
+          </p>
+        </div>
       </CardContent>
       <CardFooter className="flex justify-between">
         <Button variant="outline" onClick={() => setIsEditing(true)}>
