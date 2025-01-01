@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { db } from "@/db/mockDb";
 import { Merchant, Offer } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
@@ -9,6 +8,7 @@ import { CustomerSearch } from "@/components/merchant/CustomerSearch";
 import { Settings } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { OfferForm } from "@/components/merchant/OfferForm";
+import { supabase } from "@/integrations/supabase/client";
 
 const MerchantDashboard = () => {
   const [merchant, setMerchant] = useState<Merchant | null>(null);
@@ -18,13 +18,77 @@ const MerchantDashboard = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const mockMerchant = db.findUserByEmail("joao@supermercado.com") as Merchant;
-    setMerchant(mockMerchant);
+    // Initial fetch of offers
+    const fetchOffers = async () => {
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError) {
+        console.error("Error fetching session:", sessionError);
+        return;
+      }
 
-    if (mockMerchant) {
-      const merchantOffers = db.getMerchantOffers(mockMerchant.id);
-      setOffers(merchantOffers);
-    }
+      if (!sessionData.session?.user.id) return;
+
+      const { data: merchantData, error: merchantError } = await supabase
+        .from("merchants")
+        .select("*")
+        .eq("id", sessionData.session.user.id)
+        .single();
+
+      if (merchantError) {
+        console.error("Error fetching merchant:", merchantError);
+        return;
+      }
+
+      setMerchant(merchantData);
+
+      const { data: offersData, error: offersError } = await supabase
+        .from("offers")
+        .select("*")
+        .eq("merchant_id", sessionData.session.user.id);
+
+      if (offersError) {
+        console.error("Error fetching offers:", offersError);
+        return;
+      }
+
+      setOffers(offersData || []);
+    };
+
+    fetchOffers();
+
+    // Set up real-time subscription
+    const channel = supabase
+      .channel('offers-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'offers'
+        },
+        (payload) => {
+          console.log('Real-time update received:', payload);
+          
+          if (payload.eventType === 'INSERT') {
+            setOffers(current => [...current, payload.new as Offer]);
+          } else if (payload.eventType === 'UPDATE') {
+            setOffers(current =>
+              current.map(offer =>
+                offer.id === payload.new.id ? payload.new as Offer : offer
+              )
+            );
+          } else if (payload.eventType === 'DELETE') {
+            setOffers(current =>
+              current.filter(offer => offer.id !== payload.old.id)
+            );
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const handleCreateOffer = (formData: FormData) => {

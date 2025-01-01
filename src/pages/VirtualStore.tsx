@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import { db } from "@/db/mockDb";
 import { Offer, Product } from "@/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { supabase } from "@/integrations/supabase/client";
 
 const VirtualStore = () => {
   const [offers, setOffers] = useState<Offer[]>([]);
@@ -12,18 +12,79 @@ const VirtualStore = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Get all merchant IDs from mockUsers
-    const merchantIds = Object.values(db.mockUsers)
-      .filter(user => user.role === "merchant")
-      .map(user => user.id);
+    // Initial fetch of offers
+    const fetchOffers = async () => {
+      const { data: offersData, error: offersError } = await supabase
+        .from("offers")
+        .select("*")
+        .eq("active", true);
 
-    // Get offers from all merchants
-    const allOffers = merchantIds.flatMap(id => db.getMerchantOffers(id));
-    setOffers(allOffers);
+      if (offersError) {
+        console.error("Error fetching offers:", offersError);
+        return;
+      }
 
-    // Get all active products
-    const allProducts = db.getActiveProducts();
-    setProducts(allProducts);
+      setOffers(offersData || []);
+    };
+
+    // Initial fetch of products
+    const fetchProducts = async () => {
+      const { data: productsData, error: productsError } = await supabase
+        .from("products")
+        .select("*")
+        .eq("active", true);
+
+      if (productsError) {
+        console.error("Error fetching products:", productsError);
+        return;
+      }
+
+      setProducts(productsData || []);
+    };
+
+    fetchOffers();
+    fetchProducts();
+
+    // Set up real-time subscription for offers
+    const channel = supabase
+      .channel('offers-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'offers',
+          filter: 'active=eq.true'
+        },
+        (payload) => {
+          console.log('Real-time update received:', payload);
+          
+          if (payload.eventType === 'INSERT' && payload.new.active) {
+            setOffers(current => [...current, payload.new as Offer]);
+          } else if (payload.eventType === 'UPDATE') {
+            if (payload.new.active) {
+              setOffers(current =>
+                current.map(offer =>
+                  offer.id === payload.new.id ? payload.new as Offer : offer
+                )
+              );
+            } else {
+              setOffers(current =>
+                current.filter(offer => offer.id !== payload.new.id)
+              );
+            }
+          } else if (payload.eventType === 'DELETE') {
+            setOffers(current =>
+              current.filter(offer => offer.id !== payload.old.id)
+            );
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const handleRedeemOffer = (offerId: string) => {
@@ -55,11 +116,13 @@ const VirtualStore = () => {
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {products.map((product) => (
                 <Card key={product.id} className="overflow-hidden">
-                  <img
-                    src={product.image || "/placeholder.svg"}
-                    alt={product.name}
-                    className="w-full h-48 object-cover"
-                  />
+                  {product.image && (
+                    <img
+                      src={product.image}
+                      alt={product.name}
+                      className="w-full h-48 object-cover"
+                    />
+                  )}
                   <CardHeader>
                     <CardTitle>{product.name}</CardTitle>
                   </CardHeader>
@@ -76,7 +139,7 @@ const VirtualStore = () => {
                       </div>
                     </div>
                     <Button
-                      className="w-full mt-4 bg-gradient-to-r from-purple-500 to-purple-700 hover:from-purple-600 hover:to-purple-800"
+                      className="w-full mt-4"
                       onClick={() => handleRedeemProduct(product.id)}
                     >
                       Resgatar Produto
@@ -91,9 +154,9 @@ const VirtualStore = () => {
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {offers.map((offer) => (
                 <Card key={offer.id} className="overflow-hidden">
-                  {offer.image && (
+                  {offer.image_url && (
                     <img
-                      src={offer.image}
+                      src={offer.image_url}
                       alt={offer.title}
                       className="w-full h-48 object-cover"
                     />
@@ -106,7 +169,7 @@ const VirtualStore = () => {
                       {offer.description}
                     </p>
                     <p className="font-semibold mb-4">
-                      Pontos necessários: {offer.pointsRequired.toLocaleString()}
+                      Pontos + Dinheiro: {Math.floor(offer.pointsRequired).toLocaleString()} pts + R$ {offer.totalPrice.toFixed(2)}
                     </p>
                     <Button
                       className="w-full"
